@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,user-scalable=yes">
+	<title>Concentration</title>
+	<link rel="stylesheet" href="s.css" media="screen">
+	<style media="screen">
+	.card{
+	    width: 100px;
+	    height: 100px;
+	    background: #c09;
+	    float:left;
+	    margin:1rem;
+	    font-size: 2rem;
+	    text-align:center;
+	    color:#fff;
+	    line-height:6.5rem
+	}
+	aside{display:none;}
+
+	.flipped{
+	    background:#0c0;
+	}
+
+    .matched{
+        visibility:hidden;
+    }
+
+	</style>
+</head>
+<body>
+
+
+<aside>
+<ul>
+	<li>Timer to track how long it takes to match sides.</li>
+	<li>Save your top scores locally</li>
+	<li>Save your top score in a DB</li>
+	<li>Can pick number of tile pairs</li>
+	<li>Need to shuffle and deal deck</li>
+	<li>Cards are at a set position though</li>
+    <li>Play against yourself in a timed game</li>
+    <li>Play against someone else using web sockets? (untimed)</li>
+    <li>Start and pause buttons?</li>
+    <li>Number of attempts?</li>
+    <li>Levels to determine how many seconds you get to view each item for? </li>
+    <li>See: http://www.mathsisfun.com/games/memory/index.html</li>
+</ul>
+</aside>
+
+<script type="text/javascript" src="concentration.js"></script>
+</body>
+</html>
