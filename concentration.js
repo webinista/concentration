@@ -89,35 +89,13 @@ window.addEventListener('click', function(e){
     }
 },false);
 
-/* stack.setHandler('click',function(e){
-
-var cp = curpair;
-        // clear out current pair
-        if( cp.length >= 2){
-            while( cp.length ){
-                cp.pop();
-            }
-        }
-
-        cp.push( e.target.className ); // make this better. use data-* maybe?
-
-        /* if we have a pair to compare */
-       /* if( cp.length == 2){
-            doesmatch( cp[0], cp[1] );
-        }
-
-}, false); */
-
 doesmatch = function(a,b){
     var matches, matchevt;
 
     if( arguments.length == 2){
-
         (a === b) ? matches = 'matches' : matches = 'resetcards';
-
-        matchevt = new Event( matches, {bubbles:false});
+        matchevt = new Event( matches );
         window.dispatchEvent( matchevt );
-
     } else {
         throw new Error('I need two arguments to compare.');
     }
@@ -129,7 +107,10 @@ var onMatch = function(e){
     for(var i=0; i < len; i++){
         these[i].classList.add('matched');
     }
-    onReset();
+    /* Reset the list of flipped items */
+    window.dispatchEvent( new Event('resetcards') );
+
+    isdone();
 }
 
 var onReset = function(e){
@@ -146,5 +127,17 @@ var onReset = function(e){
     }
 }
 
+var isdone = function(){
+    var matchedpairs = document.getElementsByClassName('matched').length / 2;
+    if(matchedpairs == pairs){
+        window.dispatchEvent( new Event('stoptime') );
+    }
+}
+
+var onStop = function(){
+    console.log('stop clock');
+}
+
 window.addEventListener('matches', onMatch, false);
 window.addEventListener('resetcards', onReset, false);
+window.addEventListener('stoptime', onStop, false);
