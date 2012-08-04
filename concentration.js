@@ -110,9 +110,10 @@ var cp = curpair;
 
 doesmatch = function(a,b){
     var matches, matchevt;
+
     if( arguments.length == 2){
 
-        (a === b) ? matches = 'matches' : matches = 'doesntmatch';
+        (a === b) ? matches = 'matches' : matches = 'resetcards';
 
         matchevt = new Event( matches, {bubbles:false});
         window.dispatchEvent( matchevt );
@@ -122,15 +123,16 @@ doesmatch = function(a,b){
     }
 }
 
-var matchHandler = function(e){
+var onMatch = function(e){
     var these = document.getElementsByClassName('flipped');
     var len = these.length;
     for(var i=0; i < len; i++){
         these[i].classList.add('matched');
     }
+    onReset();
 }
 
-var doesntMatchHandler = function(e){
+var onReset = function(e){
     /* Using querySelectorAll even tho it's slower
        because we need a static list, not a
        dynamic one. Otherwise, the second flipped item
@@ -144,6 +146,5 @@ var doesntMatchHandler = function(e){
     }
 }
 
-
-window.addEventListener('doesntmatch', doesntMatchHandler, false);
-window.addEventListener('matches', matchHandler, false);
+window.addEventListener('matches', onMatch, false);
+window.addEventListener('resetcards', onReset, false);
