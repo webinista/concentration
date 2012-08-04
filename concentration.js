@@ -45,8 +45,8 @@ for(var j=0; j < deck1.length; j++){
     cardA.appendChild(valueA);
     cardB.appendChild(valueB);
 
-    cardA.setAttribute('class',deck1[j]);
-    cardB.setAttribute('class',deck2[j]);
+    cardA.setAttribute('data-cardvalue',deck1[j]);
+    cardB.setAttribute('data-cardvalue',deck2[j]);
 
     cardA.setAttribute('class','card');
     cardB.setAttribute('class','card');
@@ -68,21 +68,24 @@ NodeList.prototype.setHandler = HTMLCollection.prototype.setHandler = function(e
 /* Using event delegation here. That might not be ideal. */
 window.addEventListener('click', function(e){
     if( e.target.toString() == '[object HTMLDivElement]' ){
-
         var cp = curpair;
-        // clear out current pair
+
+        /* Show the card */
+        e.target.classList.add('flipped');
+
+        /* clear out current pair */
         if( cp.length >= 2){
             while( cp.length ){
                 cp.pop();
             }
         }
 
-        cp.push( e.target.className ); // make this better. use data-* maybe?
+        cp.push( e.target.dataset.cardvalue );
+
         /* if we have a pair to compare */
         if( cp.length == 2){
             doesmatch( cp[0], cp[1] );
         }
-
     }
 },false);
 
@@ -106,21 +109,41 @@ var cp = curpair;
 }, false); */
 
 doesmatch = function(a,b){
-    var matches;
+    var matches, matchevt;
     if( arguments.length == 2){
-        if( a === b){
-            console.log( a=== b);
-            /* Using new, simpler event constructor syntax */
-            // matches = new Event('matches', {bubbles:false});
-            // window.dispatchEvent(matches);
-        }
+
+        (a === b) ? matches = 'matches' : matches = 'doesntmatch';
+
+        matchevt = new Event( matches, {bubbles:false});
+        window.dispatchEvent( matchevt );
+
     } else {
         throw new Error('I need two arguments to compare.');
     }
 }
 
-var matchHandler = function(whichOnes){
-    console.log( 'matches!' );
+var matchHandler = function(e){
+    var these = document.getElementsByClassName('flipped');
+    var len = these.length;
+    for(var i=0; i < len; i++){
+        these[i].classList.add('matched');
+    }
 }
 
+var doesntMatchHandler = function(e){
+    /* Using querySelectorAll even tho it's slower
+       because we need a static list, not a
+       dynamic one. Otherwise, the second flipped item
+       won't be unflipped.
+    */
+    var these = document.getElementsByClassName('card');
+    for(var i=0; i < these.length; i++){
+        if( these[i].classList.contains('flipped') ){
+            these[i].classList.remove('flipped');
+        }
+    }
+}
+
+
+window.addEventListener('doesntmatch', doesntMatchHandler, false);
 window.addEventListener('matches', matchHandler, false);
