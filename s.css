@@ -1,0 +1,150 @@
+html, body{
+    height:100%;
+    margin:0;
+    padding:0
+}
+#deck{
+   -moz-perspective: 1000px;
+    -ms-perspective: 1000px;
+     -o-perspective: 1000px;
+-webkit-perspective: 1000px;
+        perspective: 1000px;
+
+}
+
+.card{
+    width: 100px;
+    height: 100px;
+    float:left;
+    margin:1rem;
+    font-size: 2rem;
+    text-align:center;
+    color:#fff;
+    line-height:6.5rem;
+    cursor:pointer;
+    position:relative;
+   -moz-transform-style: preserve-3d;
+    -ms-transform-style: preserve-3d;
+     -o-transform-style: preserve-3d;
+-webkit-transform-style: preserve-3d;
+        transform-style: preserve-3d;
+
+
+   -moz-transition:    -moz-transform 300ms ease-in-out;
+    -ms-transition:     -ms-transform 300ms ease-in-out;
+     -o-transition:      -o-transform 300ms ease-in-out;
+-webkit-transition: -webkit-transform 300ms ease-in-out;
+        transition:         transform 300ms ease-in-out;
+}
+
+.front,.back{
+    position: absolute;
+    top:0;
+    left: 0;
+    width:100%;
+
+}
+
+.front{
+    background: hsl(360, 0%, 72%);
+
+}
+
+.back{
+    background:hsla(309, 100%, 50%,1);
+
+    -moz-backface-visibility: hidden;
+     -ms-backface-visibility: hidden;
+      -o-backface-visibility: hidden;
+ -webkit-backface-visibility: hidden;
+         backface-visibility: hidden;
+}
+
+aside{display:none;}
+
+.card.flipped{
+   -moz-transform: rotate3d(100,100,0,180deg);
+    -ms-transform: rotate3d(100,100,0,180deg);
+     -o-transform: rotate3d(100,100,0,180deg);
+-webkit-transform: rotate3d(100,100,0,180deg);
+        transform: rotate3d(100,100,0,180deg);
+
+   -moz-transition:    -moz-transform 300ms ease-in-out;
+    -ms-transition:     -ms-transform 300ms ease-in-out;
+     -o-transition:      -o-transform 300ms ease-in-out;
+-webkit-transition: -webkit-transform 300ms ease-in-out;
+        transition:         transform 300ms ease-in-out;
+}
+
+
+.card.flipped .front{
+   -moz-transform: rotate3d(-100,-100,0,-180deg);
+    -ms-transform: rotate3d(-100,-100,0,-180deg);
+     -o-transform: rotate3d(-100,-100,0,-180deg);
+-webkit-transform: rotate3d(-100,-100,0,-180deg);
+        transform: rotate3d(-100,-100,0,-180deg);
+
+}
+
+.matched{
+   -moz-transform: scale(.01);
+    -ms-transform: scale(.01);
+     -o-transform: scale(.01);
+-webkit-transform: scale(.01);
+        transform: scale(.01);
+
+   /* -moz-transform-origin: 0 0;
+    -ms-transform-origin: 0 0;
+     -o-transform-origin: 0 0;
+-webkit-transform-origin: 0 0;
+        transform-origin: 0 0; */
+
+   -moz-transition:    -moz-transform 300ms ease-in-out;
+    -ms-transition:     -ms-transform 300ms ease-in-out;
+     -o-transition:      -o-transform 300ms ease-in-out;
+-webkit-transition: -webkit-transform 300ms ease-in-out;
+        transition:         transform 300ms ease-in-out;
+}
+
+.matched.flipped.back{
+    display:none;
+}
+
+#overlay{
+    width:100%;
+    height:110%;
+    background:rgba(0,0,0,.5);
+    position:fixed;
+    top:0;
+    left:0;
+}
+
+/* fix this */
+#countdown, #score, #config{
+    width: 80%;
+    height: 50%;
+    font-size: 3rem;
+    background: rgb(255,255,255);
+    margin:2rem auto;
+    text-align: center;
+}
+#config p:first-child{
+    font-size:3rem
+}
+#config p{
+    font-size:1rem;
+    margin:0
+}
+
+.hide{
+    display: none;
+}
+
+label{
+    display:block;
+}
+
+input[type=number]{
+    text-align:right;
+    font-size:1.1rem
+}
