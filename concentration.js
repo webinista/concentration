@@ -237,16 +237,16 @@ var onshowscore = function(e){
         points = document.getElementById('points');
 
     if(e.score){
-        points.appendChild( document.createTextNode(e.score) );
+        points.replaceChild( document.createTextNode(e.score), points.firstChild );
     }
     if(e.tries){
-        tries.appendChild( document.createTextNode(e.tries) );
+        tries.replaceChild( document.createTextNode(e.tries), tries.firstChild );
     }
     if(e.time){
-        time.appendChild( document.createTextNode( Lib.hundreths(e.time)+' seconds') );
+        time.replaceChild( document.createTextNode( Lib.hundreths(e.time)+' seconds'), time.firstChild );
     }
     if(e.successrate){
-        rate.appendChild( document.createTextNode( Lib.hundreths( e.successrate*100)+'%' ) );
+        rate.replaceChild( document.createTextNode( Lib.hundreths( e.successrate*100)+'%' ), rate.firstChild );
     }
 
     document.getElementById('overlay').classList.remove('hide');
