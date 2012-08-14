@@ -1,9 +1,12 @@
-/* TO DOs:
+    /* TO DOs:
 - Add touch support
 - Add a way to inject a style information/sheet if 3D
   transforms aren't supported
 - Wrap so can use as an obj
 - Change appendChilds to updateNode
+
+- rewrite show/hide cards so that we're reusing elements
+and not recreating them.
 */
 
 var conf = {};
@@ -19,7 +22,8 @@ var score,
     end,
     numtries = 0,
     config = document.getElementById('config'),
-    deckwrapper = document.getElementById('deck');
+    deckwrapper = document.getElementById('deck'),
+    tpl;
 
 /* Using event delegation here. That might not be ideal. */
 
@@ -117,17 +121,22 @@ var onstop = function(){
 }
 
 var shuffle = function(numpairs){
+
     var cnf = conf;
     cnf.pairs = numpairs;
+
     /* Shuffle the cards, pick a set,
        copy the set and then shuffle it */
     var c = cards.shuffle(),
         deck1 = c.splice(0,cnf.pairs),
         deck2 = deck1.copy().shuffle(),
-
-        /* Get the first figure to use as a template */
-        tpl = deckwrapper.firstElementChild,
         cardA, cardB, valueA, valueB, cd;
+
+    /* Get the first figure to use as a template */
+    /* Make it global */
+
+    tpl = tpl || deckwrapper.firstElementChild;
+
 
     for(var j=0; j < deck1.length; j++){
         /* Need to copy TPL and replace the items */
@@ -146,11 +155,13 @@ var shuffle = function(numpairs){
 
         deckwrapper.update( cardA );
         deckwrapper.update( cardB );
-
     }
 
-    /* Remove the template node from the stack */
-    deckwrapper.removeChild( tpl ).childNodes;
+    /* If we have more cards than we need, remove the
+    template node from the stack */
+    if( deckwrapper.getElementsByTagName('figure').length > numpairs * 2 ){
+        deckwrapper.removeChild( deckwrapper.firstElementChild );
+    }
 
     /* Add an event handler for the start and stop time events */
     window.addEventListener('starttime', onstart, false);
@@ -260,6 +271,7 @@ var onsavescore = function(e){
 var onconfsubmit = function(e){
     e.preventDefault();
     e.target.classList.add('hide');
+    conf.pairs = e.target['pairs'].value;
     shuffle( e.target['pairs'].value );
 }
 
@@ -269,11 +281,17 @@ var replay = function(e){
     e.target.parentNode.parentNode.classList.add('hide');
 
     /* Remove the matched class from all cards */
-    cards = document.getElementsByClassName('card');
+    cards = deckwrapper.getElementsByClassName('card');
     len = cards.length;
-    for(i = 0; i < len; i++){
-        cards[i].classList.remove('matched');
+
+   /* for(i = 1; i < len; i++){
+        deckwrapper.removeChild( cards[i] );
+    } */
+
+    while( deckwrapper.firstElementChild ){
+        deckwrapper.removeChild( deckwrapper.firstElementChild );
     }
+
     document.getElementById('config').classList.remove('hide');
 
     var cd = document.getElementById('countdown');
