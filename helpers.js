@@ -32,8 +32,16 @@ NodeList.prototype.setHandler = HTMLCollection.prototype.setHandler = function(e
 window.Lib = (function(global){
     return {
         hasLocalStorage: function(){
-            return ( global.localStorage === undefined ) && ( Object.prototype.toString.call(global.localStorage) === "[object Storage]");
+            return ( global.localStorage !== undefined ) && ( Object.prototype.toString.call(global.localStorage) === "[object Storage]");
+        },
+        hundreths: function(number){
+            number += '';
+            var splitondecimal = number.split('.');
+            splitondecimal[1] = splitondecimal[1].substr(0,2);
+            return splitondecimal.join('.') * 1;
+        },
+        formatnum: function(number){
+            // format numbers to use commas
         }
-    };
-
+    }
 })(window);

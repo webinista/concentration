@@ -1,3 +1,11 @@
+/*
+TO DOs:
+- Add gradient pattern for back of card.
+- Use table display for layout, but learn Flexbox
+- Test whether calc()  unit support is available
+*/
+
+
 html, body{
     height:100%;
     margin:0;
@@ -106,7 +114,11 @@ aside{display:none;}
         transition:         transform 300ms ease-in-out;
 }
 
-.matched.flipped.back{
+.matched .front{
+    background-color:transparent;
+}
+
+.matched.flipped .back{
     display:none;
 }
 
@@ -120,10 +132,9 @@ aside{display:none;}
 }
 
 /* fix this */
-#countdown, #score, #config{
+#countdown, #score, #config, #top10scores{
     width: 80%;
     height: 50%;
-    font-size: 3rem;
     background: rgb(255,255,255);
     margin:2rem auto;
     text-align: center;

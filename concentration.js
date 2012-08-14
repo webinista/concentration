@@ -10,7 +10,8 @@ var conf = {};
 conf.countdown = 3;
 conf.pairs = 3; // set a default
 
-var deck1,
+var score,
+    deck1,
     deck2,
     curpair = [],
     cards = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z'.split(','),
@@ -42,7 +43,7 @@ var onclick = function(e){
 
             /* if we have a pair to compare */
             if( cp.length == 2){
-                // this works for now, but can we use a transition end instead?
+                /* this works for now, but can we use a transition end instead? */
                 setTimeout( function(){ doesmatch( cp[0], cp[1] ) }, 500);
             }
         }
@@ -52,8 +53,8 @@ var onclick = function(e){
 var doesmatch = function(a,b){
     var matches, matchevt;
 
-    // increment the number of tries
-    numtries++;
+    /* increment the number of tries */
+    numtries += 1;
 
     if( arguments.length == 2){
         (a === b) ? matches = 'matches' : matches = 'resetcards';
@@ -105,12 +106,13 @@ var onstart = function(){
 }
 
 var onstop = function(){
-    var scoreevt;
-    end = Date.now();
-
+    var scoreevt, st = start;
+    document.getElementById('deck').classList.add('hide');
     scoreevt = new Event('tallyscore');
+    scoreevt.start = start;
+    scoreevt.end = Date.now();
+    scoreevt.tries = numtries;
     window.dispatchEvent(scoreevt);
-
     window.removeEventListener('click', onclick ,false);
 }
 
@@ -187,7 +189,7 @@ var countdown = function(){
     window.addEventListener('tallyscore', ontallyscore, false);
 
     /* When the game ends and we want to save the score.*/
-    window.addEventListener('savescore', onsavescore, false);
+    window.addEventListener('showscore', onshowscore, false);
 
     /* When we match a pair */
     window.addEventListener('matches', onmatch, false);
@@ -199,40 +201,136 @@ var countdown = function(){
 }
 
 var ontallyscore = function(e){
-    var st = start, e = end, nt = numtries, p = conf.pairs, score, savescore;
+    var p = conf.pairs,
+        score, savescore, howlong, success;
     /*
        calculate the score.
        pairs / number of tries * length of time * 5.
     */
-    score = ( p / nt ) * (e - st) * 5;
+    howlong = e.end - e.start;
+    success = p / e.tries;
+    score = success * howlong * 5;
 
-    sendscore = new Event('savescore');
+    sendscore = new Event('showscore');
     sendscore.score = Math.floor( score );
+    sendscore.tries = e.tries;
+    sendscore.time  = howlong/1000;
+    sendscore.successrate = success;
     window.dispatchEvent(sendscore);
+    window.addEventListener('savescore',onsavescore,false);
 }
 
-var onsavescore = function(e){
+var onshowscore = function(e){
+    var tries = document.getElementById('tries').getElementsByTagName('b')[0],
+        time = document.getElementById('time').getElementsByTagName('b')[0],
+        rate = document.getElementById('percentage').getElementsByTagName('b')[0],
+        points = document.getElementById('points');
+
+    if(e.score){
+        points.appendChild( document.createTextNode(e.score) );
+    }
+    if(e.tries){
+        tries.appendChild( document.createTextNode(e.tries) );
+    }
+    if(e.time){
+        time.appendChild( document.createTextNode(e.time+' seconds') );
+    }
+    if(e.successrate){
+        rate.appendChild( document.createTextNode(e.successrate*100+'%') );
+    }
 
     document.getElementById('overlay').classList.remove('hide');
     document.getElementById('score').classList.remove('hide');
 
-  /* If we have Local Storage available, offer the option to save the score */
+    var savescore = new Event('savescore');
+    savescore.score = e.score;
+    window.dispatchEvent(savescore);
+}
+
+var onsavescore = function(e){
+    /* If we have Local Storage available, offer the option to save the score */
     if(Lib.hasLocalStorage()){
-        console.log('Save this to localstorage');
+        localStorage[ localStorage.length ] = e.score;
+        document.getElementById('gettop10').classList.remove('hide');
     }
 }
 
-var onsubmit = function(e){
+
+var onconfsubmit = function(e){
     e.preventDefault();
     e.target.classList.add('hide');
-
     shuffle( e.target['pairs'].value );
 }
 
-var init = function(e){    /* Add an event listener to the configuration form. */
-    config.addEventListener('submit', onsubmit, false);
+/* Show the Top 10 */
+var onscoresubmit = function(e){
+    e.preventDefault();
+
+    var numscores =  localStorage.length,
+        i,
+        list,
+        scores = [],
+        top10,
+        top10scr,
+        score;
+
+    /* Move scores from an object to an array */
+    for(i=0; i < numscores; i++){
+        scores[i] = localStorage.getItem( localStorage.key(i) ) * 1;
+    }
+
+    /* Sort scores */
+    top10 = scores.sort( function(a,b){ return a < b; }).splice(0,10);
+    list = buildtop10( top10 );
+    top10scr = document.getElementById('top10scores');
+    top10scr.insertBefore(list,top10scr.getElementsByTagName('h1')[0].nextElementSibling);
+    top10scr.classList.remove('hide');
+
+    document.getElementById('score').classList.add('hide');
+
+    /* Reset scores */
+    document.getElementById('resethighscores').addEventListener('click',clearscores,false);
+
+    /* Clear old scores */
+    localStorage.clear();
+
+    /* Write sorted list back to localStorage*/
+    for(i = 0; i < top10.length; i++){
+        localStorage[i] = top10[i];
+    }
 }
 
+var buildtop10 = function(scoresarray){
+    var ol, len = scoresarray.length, li, i, t, sca;
+    ol = document.createElement('ol');
+    for(i = 0; i < 10; i++){
+        isNaN( scoresarray[i] * 1 ) ? sca = '—' : sca = scoresarray[i];
+
+        t = document.createTextNode( sca );
+        li = document.createElement('li');
+        li.appendChild( t );
+        ol.id = 'topscores';
+        ol.appendChild( li );
+    }
+    return ol;
+}
+
+var clearscores = function(){
+     var empty10 = [];
+     empty10.length = 10;
+     localStorage.clear();
+
+     // Replace the current list.
+     document.getElementById('top10scores').replaceChild( buildtop10( empty10 ), document.getElementById('topscores') );
+}
+
+var init = function(e){
+    /* Add an event listener to the configuration form. */
+    config.addEventListener('submit', onconfsubmit, false);
+    document.getElementById('score').addEventListener('submit', onscoresubmit, false);
+}
+
+window.addEventListener('savescore', onsavescore, false);
 window.addEventListener('DOMContentLoaded', init, false);
 window.addEventListener('countdown', countdown, false);
 
