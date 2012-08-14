@@ -29,6 +29,16 @@ NodeList.prototype.setHandler = HTMLCollection.prototype.setHandler = function(e
     }
 };
 
+Node.prototype.update = function( newChild, replacedChild ){
+    if( this.firstChild === undefined ){
+        this.appendChild( newChild );
+    } else if( replacedChild === undefined ){
+        this.appendChild( newChild );
+    } else {
+        this.replaceChild( newChild, replacedChild );
+    }
+}
+
 window.Lib = (function(global){
     return {
         hasLocalStorage: function(){
@@ -36,9 +46,14 @@ window.Lib = (function(global){
         },
         hundreths: function(number){
             number += '';
-            var splitondecimal = number.split('.');
-            splitondecimal[1] = splitondecimal[1].substr(0,2);
-            return splitondecimal.join('.') * 1;
+            if( number.indexOf('.') > -1 ){
+               var splitondecimal = number.split('.');
+               splitondecimal[1] = splitondecimal[1].substr(0,2);
+               return splitondecimal.join('.') * 1;
+            } else {
+                return number;
+            }
+
         },
         formatnum: function(number){
             // format numbers to use commas

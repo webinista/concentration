@@ -1,9 +1,9 @@
 /* TO DOs:
-
 - Add touch support
 - Add a way to inject a style information/sheet if 3D
   transforms aren't supported
 - Wrap so can use as an obj
+- Change appendChilds to updateNode
 */
 
 var conf = {};
@@ -144,8 +144,9 @@ var shuffle = function(numpairs){
         cardA.firstElementChild.replaceChild(valueA,cardA.firstElementChild.firstChild );
         cardB.firstElementChild.replaceChild(valueB,cardB.firstElementChild.firstChild );
 
-        deckwrapper.appendChild( cardA );
-        deckwrapper.appendChild( cardB );
+        deckwrapper.update( cardA );
+        deckwrapper.update( cardB );
+
     }
 
     /* Remove the template node from the stack */
@@ -196,8 +197,6 @@ var countdown = function(){
 
     /* When we don't match a pair */
     window.addEventListener('resetcards', onreset, false);
-
-
 }
 
 var ontallyscore = function(e){
@@ -233,10 +232,10 @@ var onshowscore = function(e){
         tries.appendChild( document.createTextNode(e.tries) );
     }
     if(e.time){
-        time.appendChild( document.createTextNode(e.time+' seconds') );
+        time.appendChild( document.createTextNode( Lib.hundreths(e.time)+' seconds') );
     }
     if(e.successrate){
-        rate.appendChild( document.createTextNode(e.successrate*100+'%') );
+        rate.appendChild( document.createTextNode( Lib.hundreths( e.successrate*100)+'%' ) );
     }
 
     document.getElementById('overlay').classList.remove('hide');
@@ -253,6 +252,8 @@ var onsavescore = function(e){
         localStorage[ localStorage.length ] = e.score;
         document.getElementById('gettop10').classList.remove('hide');
     }
+    /* Replay game */
+    document.getElementById('replay').addEventListener('click',replay,false);
 }
 
 
@@ -260,6 +261,28 @@ var onconfsubmit = function(e){
     e.preventDefault();
     e.target.classList.add('hide');
     shuffle( e.target['pairs'].value );
+}
+
+
+var replay = function(e){
+    var cards,i,len;
+    e.target.parentNode.parentNode.classList.add('hide');
+
+    /* Remove the matched class from all cards */
+    cards = document.getElementsByClassName('card');
+    len = cards.length;
+    for(i = 0; i < len; i++){
+        cards[i].classList.remove('matched');
+    }
+    document.getElementById('config').classList.remove('hide');
+
+    var cd = document.getElementById('countdown');
+    cd.replaceChild( document.createTextNode(' '), cd.firstChild );
+
+    var scores = document.getElementById('score').getElementsByTagName('b');
+    for(i = 0; i < scores.length; i++){
+        scores[i].replaceChild( document.createTextNode(''), scores[i].firstChild );
+    }
 }
 
 /* Show the Top 10 */
@@ -280,7 +303,7 @@ var onscoresubmit = function(e){
     }
 
     /* Sort scores */
-    top10 = scores.sort( function(a,b){ return a < b; }).splice(0,10);
+    top10 = scores.sort( function(a,b){ return b - a; }).splice(0,10);
     list = buildtop10( top10 );
     top10scr = document.getElementById('top10scores');
     top10scr.insertBefore(list,top10scr.getElementsByTagName('h1')[0].nextElementSibling);
@@ -291,7 +314,7 @@ var onscoresubmit = function(e){
     /* Reset scores */
     document.getElementById('resethighscores').addEventListener('click',clearscores,false);
 
-    /* Clear old scores */
+    /* Clear old scores so we can rewrite the current top 10 */
     localStorage.clear();
 
     /* Write sorted list back to localStorage*/
@@ -319,10 +342,11 @@ var clearscores = function(){
      var empty10 = [];
      empty10.length = 10;
      localStorage.clear();
-
      // Replace the current list.
      document.getElementById('top10scores').replaceChild( buildtop10( empty10 ), document.getElementById('topscores') );
 }
+
+
 
 var init = function(e){
     /* Add an event listener to the configuration form. */
