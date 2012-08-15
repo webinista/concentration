@@ -57,6 +57,21 @@ window.Lib = (function(global){
         },
         formatnum: function(number){
             // format numbers to use commas
-        }
+        },
+        transitionend: function(){
+			var t, transitions, el = document.createElement('fakeEl');
+			transitions = {
+			    'OTransition':'oTransitionEnd',
+			    'MSTransition':'msTransitionEnd',
+			    'MozTransition':'transitionend',
+			    'WebkitTransition':'webkitTransitionEnd',
+			    'transition':'transitionEnd'
+		    }
+			for(t in transitions){
+				if( el.style[t] !== undefined ){
+					return transitions[t];
+				}
+			}
+		}
     }
 })(window);

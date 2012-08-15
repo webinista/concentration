@@ -5,7 +5,6 @@ TO DOs:
 - Test whether calc()  unit support is available
 */
 
-
 html, body{
     height:100%;
     margin:0;
@@ -21,54 +20,55 @@ html, body{
 }
 
 .card{
-    width: 100px;
-    height: 100px;
+    width: 121px;
+    height: 121px;
     float:left;
     margin:1rem;
     font-size: 2rem;
     text-align:center;
-    color:#fff;
-    line-height:6.5rem;
+
     cursor:pointer;
     position:relative;
+
    -moz-transform-style: preserve-3d;
     -ms-transform-style: preserve-3d;
      -o-transform-style: preserve-3d;
 -webkit-transform-style: preserve-3d;
         transform-style: preserve-3d;
 
-
    -moz-transition:    -moz-transform 300ms ease-in-out;
     -ms-transition:     -ms-transform 300ms ease-in-out;
      -o-transition:      -o-transform 300ms ease-in-out;
 -webkit-transition: -webkit-transform 300ms ease-in-out;
         transition:         transform 300ms ease-in-out;
+
+    border: 1px solid #0135CD;
+    border-radius:10px;
 }
 
-.front,.back{
+.front, .back{
     position: absolute;
     top:0;
     left: 0;
-    width:100%;
-
-}
-
-.front{
-    background: hsl(360, 0%, 72%);
-
-}
-
-.back{
-    background:hsla(309, 100%, 50%,1);
-
+    margin:0;
+    height:inherit;
+    width: inherit;
     -moz-backface-visibility: hidden;
      -ms-backface-visibility: hidden;
       -o-backface-visibility: hidden;
  -webkit-backface-visibility: hidden;
          backface-visibility: hidden;
+    background-clip: border-box;
+    border-radius:inherit;
 }
 
-aside{display:none;}
+.front{
+    background: #fff;
+}
+
+.back{
+    background: url(images/cardback.gif);
+}
 
 .card.flipped{
    -moz-transform: rotate3d(100,100,0,180deg);
@@ -93,6 +93,9 @@ aside{display:none;}
         transform: rotate3d(-100,-100,0,-180deg);
 
 }
+.card.flipped .back{
+    visibility:visible;
+}
 
 .matched{
    -moz-transform: scale(.01);
@@ -101,11 +104,7 @@ aside{display:none;}
 -webkit-transform: scale(.01);
         transform: scale(.01);
 
-   /* -moz-transform-origin: 0 0;
-    -ms-transform-origin: 0 0;
-     -o-transform-origin: 0 0;
--webkit-transform-origin: 0 0;
-        transform-origin: 0 0; */
+
 
    -moz-transition:    -moz-transform 300ms ease-in-out;
     -ms-transition:     -ms-transform 300ms ease-in-out;
@@ -124,7 +123,7 @@ aside{display:none;}
 
 #overlay{
     width:100%;
-    height:110%;
+    height:100%;
     background:rgba(0,0,0,.5);
     position:fixed;
     top:0;
@@ -132,20 +131,13 @@ aside{display:none;}
 }
 
 /* fix this */
-#countdown, #score, #config, #top10scores{
-    width: 80%;
-    height: 50%;
+.panel{
     background: rgb(255,255,255);
-    margin:2rem auto;
+    margin:2rem 3rem;
+    padding: 3rem;
     text-align: center;
 }
-#config p:first-child{
-    font-size:3rem
-}
-#config p{
-    font-size:1rem;
-    margin:0
-}
+
 
 .hide{
     display: none;
@@ -158,4 +150,8 @@ label{
 input[type=number]{
     text-align:right;
     font-size:1.1rem
+}
+
+.close{
+    background: #ff0;
 }

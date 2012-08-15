@@ -1,4 +1,4 @@
-    /* TO DOs:
+/* TO DOs:
 - Add touch support
 - Add a way to inject a style information/sheet if 3D
   transforms aren't supported
@@ -9,15 +9,46 @@
 and not recreating them.
 */
 
+/* Create an individual card */
+function Card(imgsrc){
+    /* Creates:
+    <figure class="card">
+        <div class="front"></div>
+        <div class="back">&nbsp;</div>
+    </figure>
+    */
+    var front, back, card, img = new Image();
+
+    img.src = imgsrc;
+
+    front = document.createElement('div');
+    front.setAttribute('class','front');
+    front.appendChild(img);
+
+    back = front.cloneNode(false);
+    back.setAttribute('class','back');
+    back.appendChild( document.createTextNode(' ') );
+
+    card = document.createElement('figure');
+    card.setAttribute('data-cardvalue',img.src);
+    card.setAttribute('class','card');
+    card.appendChild(front);
+    card.appendChild(back);
+
+    return card;
+}
+
 var conf = {};
 conf.countdown = 3;
-conf.pairs = 3; // set a default
+conf.pairs = 4; // set a default
+// should be an array of images
+conf.cards = 'apple.png,bluestar.png,grapes.png,luckyseven.png,wine.png,bamboo2.png,heart.png,pineapple.png,yinyang.png,bananas.png,cat_paw_prints.png,knight.png,rabbit.png,baseball.png,checkmark.png,ladybug.png,rainbow.png,beachball.png,chess.png,leaf.gif,treasure.png,bird.png,chips.png,lemon.gif,wasp.png'.split(',');
 
 var score,
     deck1,
     deck2,
     curpair = [],
-    cards = 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z'.split(','),
+    cards = conf.cards,
     start,
     end,
     numtries = 0,
@@ -25,7 +56,7 @@ var score,
     deckwrapper = document.getElementById('deck'),
     tpl;
 
-/* Using event delegation here. That might not be ideal. */
+/* Using event delegation  on the window object here. */
 
 var onclick = function(e){
     if( e.target.parentNode.classList.contains('card') ){
@@ -43,13 +74,16 @@ var onclick = function(e){
                     cp.pop();
                 }
             }
+
             cp.push( e.target.parentNode.dataset.cardvalue );
 
-            /* if we have a pair to compare */
-            if( cp.length == 2){
-                /* this works for now, but can we use a transition end instead? */
-                setTimeout( function(){ doesmatch( cp[0], cp[1] ) }, 500);
-            }
+            if( cp.length == 2 ){ numtries++; }
+
+            e.target.parentNode.addEventListener(Lib.transitionend(), function(e){
+                if( cp.length == 2){
+                   doesmatch( cp[0], cp[1] );
+                }
+            },false);
         }
     }
 }
@@ -57,19 +91,17 @@ var onclick = function(e){
 var doesmatch = function(a,b){
     var matches, matchevt;
 
-    /* increment the number of tries */
-    numtries += 1;
-
     if( arguments.length == 2){
         (a === b) ? matches = 'matches' : matches = 'resetcards';
         matchevt = new Event( matches );
         window.dispatchEvent( matchevt );
     } else {
-        throw new Error('I need two arguments to compare.');
+        throw new RangeError('I need two arguments to compare.');
     }
 }
 
 var onmatch = function(e){
+
     var these = document.getElementsByClassName('flipped');
     var len = these.length;
     for(var i=0; i < len; i++){
@@ -85,20 +117,19 @@ var onmatch = function(e){
 
 var onreset = function(e){
     var these = document.getElementsByClassName('card');
-
     for(var i=0; i < these.length; i++){
         if( these[i].classList.contains('flipped') ){
             these[i].classList.remove('flipped');
         }
     }
-
 }
 
 var isdone = function(){
     /* Checks whether we have matched all pairs */
     var matchedpairs = document.getElementsByClassName('matched').length / 2;
+
     if(matchedpairs == conf.pairs){
-        window.dispatchEvent( new Event('stoptime') );
+       window.dispatchEvent( new Event('stoptime') );
     }
 }
 
@@ -116,7 +147,7 @@ var onstop = function(){
     scoreevt.start = start;
     scoreevt.end = Date.now();
     scoreevt.tries = numtries;
-    window.dispatchEvent(scoreevt);
+    setTimeout(function(){ window.dispatchEvent(scoreevt); },300);
     window.removeEventListener('click', onclick ,false);
 }
 
@@ -135,26 +166,10 @@ var shuffle = function(numpairs){
     /* Get the first figure to use as a template */
     /* Make it global */
 
-    tpl = tpl || deckwrapper.firstElementChild;
-
 
     for(var j=0; j < deck1.length; j++){
-        /* Need to copy TPL and replace the items */
-
-        cardA = tpl.cloneNode(true);
-        cardB = cardA.cloneNode(true);
-
-        cardA.setAttribute('data-cardvalue',deck1[j]);
-        cardB.setAttribute('data-cardvalue',deck2[j]);
-
-        valueA = document.createTextNode( deck1[j] );
-        valueB = document.createTextNode( deck2[j] );
-
-        cardA.firstElementChild.replaceChild(valueA,cardA.firstElementChild.firstChild );
-        cardB.firstElementChild.replaceChild(valueB,cardB.firstElementChild.firstChild );
-
-        deckwrapper.update( cardA );
-        deckwrapper.update( cardB );
+        deckwrapper.update( new Card(deck1[j]) );
+        deckwrapper.update( new Card(deck2[j]) );
     }
 
     /* If we have more cards than we need, remove the
@@ -273,6 +288,7 @@ var onconfsubmit = function(e){
     e.target.classList.add('hide');
     conf.pairs = e.target['pairs'].value;
     shuffle( e.target['pairs'].value );
+    document.getElementById('score').addEventListener('submit', onscoresubmit, false);
 }
 
 
@@ -369,7 +385,6 @@ var clearscores = function(){
 var init = function(e){
     /* Add an event listener to the configuration form. */
     config.addEventListener('submit', onconfsubmit, false);
-    document.getElementById('score').addEventListener('submit', onscoresubmit, false);
 }
 
 window.addEventListener('savescore', onsavescore, false);
