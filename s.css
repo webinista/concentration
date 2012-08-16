@@ -2,13 +2,17 @@
 TO DOs:
 - Add gradient pattern for back of card.
 - Use table display for layout, but learn Flexbox
-- Test whether calc()  unit support is available
+- Fix scoring bug
 */
 
 html, body{
     height:100%;
     margin:0;
-    padding:0
+    padding:0;
+}
+body{
+    background:#F2EBD5 url(table.gif);
+    font: 95% / 1.2 helvetica,arial,sans-serif;
 }
 #deck{
    -moz-perspective: 1000px;
@@ -16,7 +20,8 @@ html, body{
      -o-perspective: 1000px;
 -webkit-perspective: 1000px;
         perspective: 1000px;
-
+    min-height: 100%;
+    float:left;
 }
 
 .card{
@@ -42,8 +47,13 @@ html, body{
 -webkit-transition: -webkit-transform 300ms ease-in-out;
         transition:         transform 300ms ease-in-out;
 
-    border: 1px solid #0135CD;
     border-radius:10px;
+
+    box-shadow:0px 0px 10px #666
+}
+
+.card, .front, .back{
+    padding: 1em;
 }
 
 .front, .back{
@@ -67,7 +77,8 @@ html, body{
 }
 
 .back{
-    background: url(images/cardback.gif);
+    background: #BCC1D1 url(cardback2.gif);
+
 }
 
 .card.flipped{
@@ -76,12 +87,6 @@ html, body{
      -o-transform: rotate3d(100,100,0,180deg);
 -webkit-transform: rotate3d(100,100,0,180deg);
         transform: rotate3d(100,100,0,180deg);
-
-   -moz-transition:    -moz-transform 300ms ease-in-out;
-    -ms-transition:     -ms-transform 300ms ease-in-out;
-     -o-transition:      -o-transform 300ms ease-in-out;
--webkit-transition: -webkit-transform 300ms ease-in-out;
-        transition:         transform 300ms ease-in-out;
 }
 
 
@@ -91,8 +96,8 @@ html, body{
      -o-transform: rotate3d(-100,-100,0,-180deg);
 -webkit-transform: rotate3d(-100,-100,0,-180deg);
         transform: rotate3d(-100,-100,0,-180deg);
-
 }
+
 .card.flipped .back{
     visibility:visible;
 }
@@ -103,14 +108,6 @@ html, body{
      -o-transform: scale(.01);
 -webkit-transform: scale(.01);
         transform: scale(.01);
-
-
-
-   -moz-transition:    -moz-transform 300ms ease-in-out;
-    -ms-transition:     -ms-transform 300ms ease-in-out;
-     -o-transition:      -o-transform 300ms ease-in-out;
--webkit-transition: -webkit-transform 300ms ease-in-out;
-        transition:         transform 300ms ease-in-out;
 }
 
 .matched .front{
@@ -130,14 +127,18 @@ html, body{
     left:0;
 }
 
-/* fix this */
 .panel{
     background: rgb(255,255,255);
     margin:2rem 3rem;
     padding: 3rem;
     text-align: center;
+    position:relative;
 }
 
+.innerwrap{
+    margin:0 auto;
+    background: #ddd;
+}
 
 .hide{
     display: none;
@@ -153,5 +154,79 @@ input[type=number]{
 }
 
 .close{
-    background: #ff0;
+    position:absolute;
+    right:0.8rem;
+    top:0.8rem;
+
+    color:#fff;
+    font-weight:bold;
+    padding:.25rem .55rem;
+    border:3px outset #aa0000;
+    border-radius:15px;
+    box-shadow: 2px 2px 0.5rem #666, inset 0px 1px .21rem #333;
+    line-height:1;
+    cursor:pointer;
+
+    background-color: #e11d11;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(hsl(3, 86%, 47%)), to(hsl(4, 89%, 29%)));
+    background-image: -webkit-linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
+    background-image: -moz-linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
+    background-image: -o-linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
+    background-image: -ms-linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
+    background-image: linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#e11d11', EndColorStr='#8b1008');
+
+}
+
+.close:hover{
+    background-color: #8b1008;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(hsl(4, 89%, 29%)), to(hsl(3, 86%, 47%)));
+    background-image: -webkit-linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
+    background-image: -moz-linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
+    background-image: -o-linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
+    background-image: -ms-linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
+    background-image: linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#8b1008', EndColorStr='#e11d11');
+
+}
+.close:active, button:active{box-shadow:none;}
+
+button{
+    border:3px outset #6195ad;
+    font:inherit;
+    font-weight:bold;
+    line-height:1;
+    color:#fff;
+    box-shadow: 2px 2px 0.5rem #666, inset 1px 1px .31rem #666;
+    border-radius:15px;
+    cursor:pointer;
+    padding:.25rem .55rem;
+    background-color: #336699;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(hsl(210, 50%, 40%)), to(hsl(199, 32%, 53%)));
+    background-image: -webkit-linear-gradient(top, hsl(210, 50%, 40%), hsl(199, 32%, 53%));
+    background-image: -moz-linear-gradient(top, hsl(210, 50%, 40%), hsl(199, 32%, 53%));
+    background-image: -o-linear-gradient(top, hsl(210, 50%, 40%), hsl(199, 32%, 53%));
+    background-image: -ms-linear-gradient(top, hsl(210, 50%, 40%), hsl(199, 32%, 53%));
+    background-image: linear-gradient(top, hsl(210, 50%, 40%), hsl(199, 32%, 53%));
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#336699', EndColorStr='#6195ad');
+}
+
+button:hover{
+    background-color: #6195ad;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(hsl(199, 32%, 53%)), to(hsl(210, 50%, 40%)));
+    background-image: -webkit-linear-gradient(top, hsl(199, 32%, 53%), hsl(210, 50%, 40%));
+    background-image: -moz-linear-gradient(top, hsl(199, 32%, 53%), hsl(210, 50%, 40%));
+    background-image: -o-linear-gradient(top, hsl(199, 32%, 53%), hsl(210, 50%, 40%));
+    background-image: -ms-linear-gradient(top, hsl(199, 32%, 53%), hsl(210, 50%, 40%));
+    background-image: linear-gradient(top, hsl(199, 32%, 53%), hsl(210, 50%, 40%));
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#6195ad', EndColorStr='#336699');
+}
+
+ol{width: 13rem; margin: 1rem auto; text-align: left;}
+
+#score p{font-weight:bold;margin:1.5rem}
+#score p b{font-size:2.2em;display:block;font-weight:normal}
+#score h1 b{font-size:2.2em;}
+#countdown{
+    font-size: 8rem;
 }

@@ -2,11 +2,9 @@
 - Add touch support
 - Add a way to inject a style information/sheet if 3D
   transforms aren't supported
-- Wrap so can use as an obj
-- Change appendChilds to updateNode
+- Wrap so can use as an obj?
+- Format scores with commas.
 
-- rewrite show/hide cards so that we're reusing elements
-and not recreating them.
 */
 
 /* Create an individual card */
@@ -40,9 +38,9 @@ function Card(imgsrc){
 
 var conf = {};
 conf.countdown = 3;
-conf.pairs = 4; // set a default
+conf.pairs = 2; // set a default
 // should be an array of images
-conf.cards = 'apple.png,bluestar.png,grapes.png,luckyseven.png,wine.png,bamboo2.png,heart.png,pineapple.png,yinyang.png,bananas.png,cat_paw_prints.png,knight.png,rabbit.png,baseball.png,checkmark.png,ladybug.png,rainbow.png,beachball.png,chess.png,leaf.gif,treasure.png,bird.png,chips.png,lemon.gif,wasp.png'.split(',');
+conf.cards = 'apple.png,bluestar.png,grapes.png,luckyseven.png,wine.png,bamboo2.png,heart.png,pineapple.png,yinyang.png,bananas.png,cat_paw_prints.png,knight.png,rabbit.png,baseball.png,checkmark.png,ladybug.png,diamond.png,beachball.png,chess.png,leaf.gif,treasure.png,bird.png,chips.png,lemon.gif,wasp.png'.split(',');
 
 var score,
     deck1,
@@ -85,6 +83,11 @@ var onclick = function(e){
                 }
             },false);
         }
+    }
+
+    if( e.target.classList.contains('close') ){
+        document.getElementById('top10scores').classList.add('hide');
+        document.getElementById('score').classList.remove('hide');
     }
 }
 
@@ -148,7 +151,7 @@ var onstop = function(){
     scoreevt.end = Date.now();
     scoreevt.tries = numtries;
     setTimeout(function(){ window.dispatchEvent(scoreevt); },300);
-    window.removeEventListener('click', onclick ,false);
+    // window.removeEventListener('click', onclick ,false);
 }
 
 var shuffle = function(numpairs){
@@ -293,30 +296,29 @@ var onconfsubmit = function(e){
 
 
 var replay = function(e){
-    var cards,i,len;
+    var cards,i,len,cd,scores;
     e.target.parentNode.parentNode.classList.add('hide');
 
-    /* Remove the matched class from all cards */
+    /* Remove all cards from stack */
     cards = deckwrapper.getElementsByClassName('card');
-    len = cards.length;
-
-   /* for(i = 1; i < len; i++){
-        deckwrapper.removeChild( cards[i] );
-    } */
-
+    len   = cards.length;
     while( deckwrapper.firstElementChild ){
         deckwrapper.removeChild( deckwrapper.firstElementChild );
     }
 
+    /* Show the config screen - might remove. */
     document.getElementById('config').classList.remove('hide');
 
-    var cd = document.getElementById('countdown');
+    cd = document.getElementById('countdown');
     cd.replaceChild( document.createTextNode(' '), cd.firstChild );
 
-    var scores = document.getElementById('score').getElementsByTagName('b');
+    scores = document.getElementById('score').getElementsByTagName('b');
+
     for(i = 0; i < scores.length; i++){
         scores[i].replaceChild( document.createTextNode(''), scores[i].firstChild );
     }
+    /* reset numtries */
+    numtries = 0;
 }
 
 /* Show the Top 10 */
@@ -339,10 +341,16 @@ var onscoresubmit = function(e){
     /* Sort scores */
     top10 = scores.sort( function(a,b){ return b - a; }).splice(0,10);
     list = buildtop10( top10 );
-    top10scr = document.getElementById('top10scores');
-    top10scr.insertBefore(list,top10scr.getElementsByTagName('h1')[0].nextElementSibling);
-    top10scr.classList.remove('hide');
+    top10scr = document.getElementById('top10scores').getElementsByTagName('div')[0];
 
+    /* Is this the first time we're inserting? If not, replace the current list. */
+    if( Object.prototype.toString.call( top10scr.getElementsByTagName('h1')[0].nextElementSibling ) == "[object HTMLParagraphElement]" ){
+        top10scr.insertBefore( list, top10scr.lastElementChild );
+    } else {
+        top10scr.replaceChild(list, top10scr.getElementsByTagName('h1')[0].nextElementSibling);
+    }
+
+    top10scr.parentNode.classList.remove('hide');
     document.getElementById('score').classList.add('hide');
 
     /* Reset scores */
@@ -362,7 +370,6 @@ var buildtop10 = function(scoresarray){
     ol = document.createElement('ol');
     for(i = 0; i < 10; i++){
         isNaN( scoresarray[i] * 1 ) ? sca = '—' : sca = scoresarray[i];
-
         t = document.createTextNode( sca );
         li = document.createElement('li');
         li.appendChild( t );
@@ -376,11 +383,9 @@ var clearscores = function(){
      var empty10 = [];
      empty10.length = 10;
      localStorage.clear();
-     // Replace the current list.
-     document.getElementById('top10scores').replaceChild( buildtop10( empty10 ), document.getElementById('topscores') );
+     /* Replace the current list. */
+     document.getElementById('top10scores').getElementsByTagName('div')[0].replaceChild( buildtop10( empty10 ), document.getElementsByTagName('ol')[0] );
 }
-
-
 
 var init = function(e){
     /* Add an event listener to the configuration form. */

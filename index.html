@@ -10,31 +10,33 @@
 
 <section id="overlay">
     <form id="config" class="panel">
-        <p>
-        <label for="pairs">How many pairs?</label>
-        <input type="number" id="pairs" name="pairs" value="4" min="4" max="26">
-        <button type="submit">Okay</button>
-        </p>
-        <p>Please enter a value between 4 and 26.</p>
+       <div class="innerwrap">
+        <h1><label for="pairs">How many pairs?</label></h1>
+         <p><input type="number" id="pairs" name="pairs" value="2" min="2" max="10">
+         <button type="submit">Okay</button></p>
+         <p>Please enter a value between 4 and 10.</p>
+        </div>
     </form>
 
     <section id="countdown" class="hide panel">&nbsp;</section>
 
     <form id="score" class="hide panel">
-        <h1>You scored <b id="points">&bnsp;</b> points!</h1>
-        <p id="time">Time: <b>&bnsp;</b></p>
-        <p id="tries">Tries: <b>&bnsp;</b> tries</p>
-        <p id="percentage">Success rate: <b>&bnsp;</b></p>
-        <p class="hide" id="gettop10">
+        <h1>You scored <b id="points">&nbsp;</b> points!</h1>
+        <p id="time">Time: <b>&nbsp;</b></p>
+        <p id="tries">Tries: <b>&nbsp;</b></p>
+        <p id="percentage">Success rate: <b>&nbsp;</b></p>
+        <p>
             <button type="button" id="replay">Replay</button>
-            <button type="submit">View top scores</button>
+            <button type="submit" id="gettop10">View top scores</button>
         </p>
     </form>
 
     <section id="top10scores" class="hide panel">
-        <a class="close">close</a>
-        <h1>Top 10 Scores</h1>
-        <p><button type="button" id="resethighscores">Reset</button></p>
+        <p><a class="close">close</a></p>
+        <div class="innerwrap">
+            <h1>Top 10 Scores</h1>
+            <p><button type="button" id="resethighscores">Reset</button></p>
+        </div>
     </section>
 
 </section>
