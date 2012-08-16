@@ -13,6 +13,7 @@ html, body{
 body{
     background:#F2EBD5 url(table.gif);
     font: 95% / 1.2 helvetica,arial,sans-serif;
+    color:#222;
 }
 #deck{
    -moz-perspective: 1000px;
@@ -133,24 +134,21 @@ body{
     padding: 3rem;
     text-align: center;
     position:relative;
+    box-shadow: 0px 0px 20px #333;
+    border-radius: .3rem
 }
 
-.innerwrap{
-    margin:0 auto;
-    background: #ddd;
-}
+.innerwrap{margin:0 auto;}
 
-.hide{
-    display: none;
-}
+.hide{display: none;}
 
-label{
-    display:block;
-}
+label{display:block;}
 
-input[type=number]{
+input{
     text-align:right;
-    font-size:1.1rem
+    font-size:2rem;
+    font-family: inherit;
+    padding-right:.3rem
 }
 
 .close{
@@ -168,27 +166,22 @@ input[type=number]{
     cursor:pointer;
 
     background-color: #e11d11;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(hsl(3, 86%, 47%)), to(hsl(4, 89%, 29%)));
     background-image: -webkit-linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
     background-image: -moz-linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
     background-image: -o-linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
     background-image: -ms-linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
     background-image: linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#e11d11', EndColorStr='#8b1008');
-
 }
 
 .close:hover{
     background-color: #8b1008;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(hsl(4, 89%, 29%)), to(hsl(3, 86%, 47%)));
     background-image: -webkit-linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
     background-image: -moz-linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
     background-image: -o-linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
     background-image: -ms-linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
     background-image: linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#8b1008', EndColorStr='#e11d11');
-
 }
+
 .close:active, button:active{box-shadow:none;}
 
 button{
@@ -202,31 +195,30 @@ button{
     cursor:pointer;
     padding:.25rem .55rem;
     background-color: #336699;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(hsl(210, 50%, 40%)), to(hsl(199, 32%, 53%)));
     background-image: -webkit-linear-gradient(top, hsl(210, 50%, 40%), hsl(199, 32%, 53%));
     background-image: -moz-linear-gradient(top, hsl(210, 50%, 40%), hsl(199, 32%, 53%));
     background-image: -o-linear-gradient(top, hsl(210, 50%, 40%), hsl(199, 32%, 53%));
     background-image: -ms-linear-gradient(top, hsl(210, 50%, 40%), hsl(199, 32%, 53%));
     background-image: linear-gradient(top, hsl(210, 50%, 40%), hsl(199, 32%, 53%));
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#336699', EndColorStr='#6195ad');
 }
 
 button:hover{
     background-color: #6195ad;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(hsl(199, 32%, 53%)), to(hsl(210, 50%, 40%)));
     background-image: -webkit-linear-gradient(top, hsl(199, 32%, 53%), hsl(210, 50%, 40%));
     background-image: -moz-linear-gradient(top, hsl(199, 32%, 53%), hsl(210, 50%, 40%));
     background-image: -o-linear-gradient(top, hsl(199, 32%, 53%), hsl(210, 50%, 40%));
     background-image: -ms-linear-gradient(top, hsl(199, 32%, 53%), hsl(210, 50%, 40%));
     background-image: linear-gradient(top, hsl(199, 32%, 53%), hsl(210, 50%, 40%));
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#6195ad', EndColorStr='#336699');
 }
 
-ol{width: 13rem; margin: 1rem auto; text-align: left;}
+ol{width: 13rem; margin: 1rem auto; text-align: right;}
+
+.display{font-family: 'SansitaOneRegular';}
+
+h1{font-size:4rem;margin:0;}
 
 #score p{font-weight:bold;margin:1.5rem}
 #score p b{font-size:2.2em;display:block;font-weight:normal}
+#score h1{font-size:1.5em;}
 #score h1 b{font-size:2.2em;}
-#countdown{
-    font-size: 8rem;
-}
+#countdown{font-size: 8rem;min-height: 8rem;}
