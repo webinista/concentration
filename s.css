@@ -11,8 +11,8 @@ html, body{
     padding:0;
 }
 body{
-    background:#F2EBD5 url(table.gif);
-    font: 95% / 1.2 helvetica,arial,sans-serif;
+    background:#eee;
+    font: 95% / 1.2 'DroidSansRegular',helvetica,arial,sans-serif;
     color:#222;
 }
 #deck{
@@ -49,8 +49,8 @@ body{
         transition:         transform 300ms ease-in-out;
 
     border-radius:10px;
-
-    box-shadow:0px 0px 10px #666
+    box-shadow:0px 0px 10px #666;
+    border: 2px solid rgba(255,255,255,1);
 }
 
 .card, .front, .back{
@@ -147,24 +147,21 @@ label{display:block;}
 input{
     text-align:right;
     font-size:2rem;
-    font-family: inherit;
-    padding-right:.3rem
+    padding-right:.3rem;
+    vertical-align:middle
 }
 
 .close{
     position:absolute;
     right:0.8rem;
     top:0.8rem;
-
     color:#fff;
     font-weight:bold;
     padding:.25rem .55rem;
-    border:3px outset #aa0000;
+    border:3px solid #aa0000;
     border-radius:15px;
     box-shadow: 2px 2px 0.5rem #666, inset 0px 1px .21rem #333;
-    line-height:1;
     cursor:pointer;
-
     background-color: #e11d11;
     background-image: -webkit-linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
     background-image: -moz-linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
@@ -185,40 +182,39 @@ input{
 .close:active, button:active{box-shadow:none;}
 
 button{
-    border:3px outset #6195ad;
+    border:3px solid #537f94;
     font:inherit;
-    font-weight:bold;
-    line-height:1;
     color:#fff;
     box-shadow: 2px 2px 0.5rem #666, inset 1px 1px .31rem #666;
     border-radius:15px;
     cursor:pointer;
-    padding:.25rem .55rem;
+    padding:.2rem .7rem;
     background-color: #336699;
-    background-image: -webkit-linear-gradient(top, hsl(210, 50%, 40%), hsl(199, 32%, 53%));
-    background-image: -moz-linear-gradient(top, hsl(210, 50%, 40%), hsl(199, 32%, 53%));
-    background-image: -o-linear-gradient(top, hsl(210, 50%, 40%), hsl(199, 32%, 53%));
-    background-image: -ms-linear-gradient(top, hsl(210, 50%, 40%), hsl(199, 32%, 53%));
-    background-image: linear-gradient(top, hsl(210, 50%, 40%), hsl(199, 32%, 53%));
+    background-color: #537f94;
+    background-image: -webkit-linear-gradient(top, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
+    background-image: -moz-linear-gradient(top, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
+    background-image: -o-linear-gradient(top, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
+    background-image: -ms-linear-gradient(top, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
+    background-image: linear-gradient(top, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
 }
 
 button:hover{
-    background-color: #6195ad;
-    background-image: -webkit-linear-gradient(top, hsl(199, 32%, 53%), hsl(210, 50%, 40%));
-    background-image: -moz-linear-gradient(top, hsl(199, 32%, 53%), hsl(210, 50%, 40%));
-    background-image: -o-linear-gradient(top, hsl(199, 32%, 53%), hsl(210, 50%, 40%));
-    background-image: -ms-linear-gradient(top, hsl(199, 32%, 53%), hsl(210, 50%, 40%));
-    background-image: linear-gradient(top, hsl(199, 32%, 53%), hsl(210, 50%, 40%));
+    background-color: #1e4266;
+    background-image: -webkit-linear-gradient(top, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
+    background-image: -moz-linear-gradient(top, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
+    background-image: -o-linear-gradient(top, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
+    background-image: -ms-linear-gradient(top, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
+    background-image: linear-gradient(top, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
 }
 
 ol{width: 13rem; margin: 1rem auto; text-align: right;}
 
-.display{font-family: 'SansitaOneRegular';}
+.display{font-family: 'SansitaOneRegular'; font-weight:500}
 
 h1{font-size:4rem;margin:0;}
 
-#score p{font-weight:bold;margin:1.5rem}
-#score p b{font-size:2.2em;display:block;font-weight:normal}
+#score p{font-weight:bold;font-family:'DroidSansRegular';margin:1.5rem,}
+#score p b{font-size:2.2em;display:block;font-family:'DroidSansBold';font-weight:normal}
 #score h1{font-size:1.5em;}
 #score h1 b{font-size:2.2em;}
 #countdown{font-size: 8rem;min-height: 8rem;}

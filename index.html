@@ -4,6 +4,8 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width,user-scalable=yes">
 	<title>Concentration</title>
+	<link rel="stylesheet" href="fonts/sansita-one/stylesheet.css" media="screen">
+	<link rel="stylesheet" href="fonts/droid-sans/stylesheet.css" media="screen">
 	<link rel="stylesheet" href="s.css" media="screen">
 </head>
 <body>
@@ -11,17 +13,17 @@
 <section id="overlay">
     <form id="config" class="panel">
        <div class="innerwrap">
-        <h1><label for="pairs">How many pairs?</label></h1>
-         <p><input type="number" id="pairs" name="pairs" value="2" min="2" max="10">
+        <h1 class="display"><label for="pairs">How many pairs?</label></h1>
+         <p><input type="number" id="pairs" name="pairs" value="4" min="4" max="10" size="2">
          <button type="submit">Okay</button></p>
          <p>Please enter a value between 4 and 10.</p>
         </div>
     </form>
 
-    <section id="countdown" class="hide panel">&nbsp;</section>
+    <section id="countdown" class="hide panel display">&nbsp;</section>
 
     <form id="score" class="hide panel">
-        <h1>You scored <b id="points">&nbsp;</b> points!</h1>
+        <h1>You scored <b id="points" class="display">&nbsp;</b> points!</h1>
         <p id="time">Time: <b>&nbsp;</b></p>
         <p id="tries">Tries: <b>&nbsp;</b></p>
         <p id="percentage">Success rate: <b>&nbsp;</b></p>
@@ -34,7 +36,7 @@
     <section id="top10scores" class="hide panel">
         <p><a class="close">close</a></p>
         <div class="innerwrap">
-            <h1>Top 10 Scores</h1>
+            <h1 class="display">Top 10 Scores</h1>
             <p><button type="button" id="resethighscores">Reset</button></p>
         </div>
     </section>
