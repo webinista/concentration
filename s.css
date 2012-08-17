@@ -49,12 +49,12 @@ body{
         transition:         transform 300ms ease-in-out;
 
     border-radius:10px;
-    box-shadow:0px 0px 10px #666;
-    border: 2px solid rgba(255,255,255,1);
+    box-shadow:0 0 5px #999;
+    border: 10px solid rgba(255,255,255,1);
 }
 
 .card, .front, .back{
-    padding: 1em;
+    padding: 40px;
 }
 
 .front, .back{
@@ -69,13 +69,12 @@ body{
       -o-backface-visibility: hidden;
  -webkit-backface-visibility: hidden;
          backface-visibility: hidden;
-    background-clip: border-box;
-    border-radius:inherit;
 }
 
 .front{
     background: #fff;
 }
+.front img{border:1px solid #fff;}
 
 .back{
     background: #BCC1D1 url(cardback2.gif);
@@ -97,10 +96,6 @@ body{
      -o-transform: rotate3d(-100,-100,0,-180deg);
 -webkit-transform: rotate3d(-100,-100,0,-180deg);
         transform: rotate3d(-100,-100,0,-180deg);
-}
-
-.card.flipped .back{
-    visibility:visible;
 }
 
 .matched{
