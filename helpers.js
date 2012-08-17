@@ -55,9 +55,6 @@ window.Lib = (function(global){
             }
 
         },
-        formatnum: function(number){
-            // format numbers to use commas
-        },
         transitionend: function(){
 			var t, transitions, el = document.createElement('fakeEl');
 			transitions = {
@@ -72,6 +69,25 @@ window.Lib = (function(global){
 					return transitions[t];
 				}
 			}
-		}
+		},
+		formatinteger:function(number,undefined){
+            var num = number+'',
+                separator,
+                digits,
+                len,
+                groups = [],
+                x = 0;
+
+            (arguments[1] !== undefined) ? separator = ',' : separator = arguments[1];
+
+            digits = num.split('');
+            len =  digits.length;
+
+            while(x < len/3 ){
+               groups[x] = digits.splice(-3).join('');
+               x++;
+            }
+            return groups.reverse().join(separator);
+        }
     }
 })(window);

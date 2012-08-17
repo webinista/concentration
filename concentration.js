@@ -166,10 +166,6 @@ var shuffle = function(numpairs){
         deck2 = deck1.copy().shuffle(),
         cardA, cardB, valueA, valueB, cd;
 
-    /* Get the first figure to use as a template */
-    /* Make it global */
-
-
     for(var j=0; j < deck1.length; j++){
         deckwrapper.update( new Card(deck1[j]) );
         deckwrapper.update( new Card(deck2[j]) );
@@ -369,7 +365,7 @@ var buildtop10 = function(scoresarray){
     var ol, len = scoresarray.length, li, i, t, sca;
     ol = document.createElement('ol');
     for(i = 0; i < 10; i++){
-        isNaN( scoresarray[i] * 1 ) ? sca = '—' : sca = scoresarray[i];
+        isNaN( scoresarray[i] * 1 ) ? sca = '————' : sca = Lib.formatinteger( scoresarray[i] );
         t = document.createTextNode( sca );
         li = document.createElement('li');
         li.appendChild( t );
@@ -391,6 +387,8 @@ var init = function(e){
     /* Add an event listener to the configuration form. */
     config.addEventListener('submit', onconfsubmit, false);
 }
+
+
 
 window.addEventListener('savescore', onsavescore, false);
 window.addEventListener('DOMContentLoaded', init, false);
