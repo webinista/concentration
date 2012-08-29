@@ -32,11 +32,11 @@ body{
     box-shadow:0 0 10px #999;
     border: 10px solid rgba(255,255,255,1);
 
-   -moz-transition:    -moz-transform 300ms ease-in-out;
-    -ms-transition:     -ms-transform 300ms ease-in-out;
-     -o-transition:      -o-transform 300ms ease-in-out;
--webkit-transition: -webkit-transform 300ms ease-in-out;
-        transition:         transform 300ms ease-in-out;
+   -moz-transition:    -moz-transform 300ms ease-in-out 500ms;
+    -ms-transition:     -ms-transform 300ms ease-in-out 500ms;
+     -o-transition:      -o-transform 300ms ease-in-out 500ms;
+-webkit-transition: -webkit-transform 300ms ease-in-out 500ms;
+        transition:         transform 300ms ease-in-out 500ms;
 
    -moz-transform-style: preserve-3d;
     -ms-transform-style: preserve-3d;
@@ -48,6 +48,7 @@ body{
 
 .card, .front, .back{
     padding: 20px;
+    background:#fff;
 }
 
 #deck .card:nth-child(4n){
@@ -68,7 +69,7 @@ body{
          backface-visibility: hidden;
 }
 
-.front{background: #fff;}
+.front{background: #fff; display:block;}
 .back{background: #BCC1D1 url(cardback2.gif);}
 
 .card.flipped{
@@ -77,9 +78,16 @@ body{
      -o-transform: rotate3d(100,100,0,180deg);
 -webkit-transform: rotate3d(100,100,0,180deg);
         transform: rotate3d(100,100,0,180deg);
+
+   -moz-transition:    -moz-transform 300ms ease-in-out;
+    -ms-transition:     -ms-transform 300ms ease-in-out;
+     -o-transition:      -o-transform 300ms ease-in-out;
+-webkit-transition: -webkit-transform 300ms ease-in-out;
+        transition:         transform 300ms ease-in-out;
+
 }
 
-.card.flipped .front{
+.card .front{
    -moz-transform: rotate3d(-100,-100,0,-180deg);
     -ms-transform: rotate3d(-100,-100,0,-180deg);
      -o-transform: rotate3d(-100,-100,0,-180deg);
@@ -87,17 +95,16 @@ body{
         transform: rotate3d(-100,-100,0,-180deg);
 }
 
-.matched{
+.card.matched{
     background: #fff;
    -moz-transform: scale(.01);
     -ms-transform: scale(.01);
      -o-transform: scale(.01);
--webkit-transform: scale(.5);
+-webkit-transform: scale(.01);
         transform: scale(.01);
 }
 
 .invisible{visibility:hidden;}
-.matched .front{background-color:transparent;}
 
 #overlay{
     width:100%;
