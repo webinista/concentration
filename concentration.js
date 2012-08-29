@@ -35,7 +35,7 @@ Note that images and fonts are subject to separate licenses.
 */
 
 /* Create an individual card */
-function Card(imgsrc){
+function Card(imgsrc,path){
     /* Creates:
     <figure class="card">
         <div class="front"></div>
@@ -44,7 +44,7 @@ function Card(imgsrc){
     */
     var front, back, card, img = new Image();
 
-    img.src = imgsrc;
+    img.src = path+imgsrc;
 
     front = document.createElement('div');
     front.setAttribute('class','front');
@@ -77,6 +77,7 @@ var conf = {},
 
 conf.countdown = 3;
 conf.pairs = 6;
+conf.imgdir = 'images/';
 
 /* Must be an array of images */
 conf.cards = 'apple.png,bluestar.png,grapes.png,luckyseven.png,wine.png,bamboo2.png,heart.png,pineapple.png,yinyang.png,bananas.png,cat_paw_prints.png,knight.png,rabbit.png,baseball.png,checkmark.png,ladybug.png,diamond.png,beachball.png,chess.png,leaf.gif,treasure.png,bird.png,chips.png,lemon.gif,wasp.png'.split(',');
@@ -172,7 +173,9 @@ var isdone = function(){
 
 /* Using event delegation  on the window object here. */
 var onclick = function(e){
-    if( e.target.parentNode.classList.contains('card') ){
+
+    if( (e.target.parentNode.classList !== undefined) &&
+        (e.target.parentNode.classList.contains('card')) ){
 
         var cp = curpair;
 
@@ -405,8 +408,8 @@ var shuffle = function(numpairs){
         cardA, cardB, valueA, valueB, cd;
 
     for(var j=0; j < deck1.length; j++){
-        deckwrapper.appendChild( new Card(deck1[j]) );
-        deckwrapper.update( new Card(deck2[j]) );
+        deckwrapper.appendChild( new Card(deck1[j],conf.imgdir) );
+        deckwrapper.update( new Card(deck2[j],conf.imgdir) );
     }
 
     /* Add an event handler for the start and stop time events */

@@ -97,7 +97,7 @@ body{
 }
 
 .front{background: #fff; display:block;}
-.back{background: #BCC1D1 url(cardback2.gif);}
+.back{background: #BCC1D1 url(images/cardback2.gif);}
 
 .card.flipped{
    -moz-transform: rotate3d(100,100,0,180deg);
