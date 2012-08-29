@@ -1,7 +1,37 @@
+/*
+MemoryConcentration version 1.0
+Copyright 2012 Tiffany B. Brown
+http://tiffanybbrown.com
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Note that images and fonts are subject to separate licenses.
+*/
+
+
 /* TO DOs:
 - Add touch support
-- Try to get some backward compatibility in here.
+- Try to get some backward compatibility in here for non 3D transform browsers
 - Refactor for better awesome!
+- Move images to a subdirectory.
+- Fix / mitigate transitions bug that causes some items
 */
 
 /* Create an individual card */
@@ -33,23 +63,25 @@ function Card(imgsrc){
     return card;
 }
 
-var conf = {};
-conf.countdown = 3;
-conf.pairs = 6; // set a default
-/* Must be an array of images */
-conf.cards = 'apple.png,bluestar.png,grapes.png,luckyseven.png,wine.png,bamboo2.png,heart.png,pineapple.png,yinyang.png,bananas.png,cat_paw_prints.png,knight.png,rabbit.png,baseball.png,checkmark.png,ladybug.png,diamond.png,beachball.png,chess.png,leaf.gif,treasure.png,bird.png,chips.png,lemon.gif,wasp.png'.split(',');
 
-var score,
+var conf = {},
     deck1,
     deck2,
     curpair = [],
-    cards = conf.cards,
     start,
     end,
     numtries = 0,
     config = document.getElementById('config'),
     deckwrapper = document.getElementById('deck'),
     tpl;
+
+conf.countdown = 3;
+conf.pairs = 6;
+
+/* Must be an array of images */
+conf.cards = 'apple.png,bluestar.png,grapes.png,luckyseven.png,wine.png,bamboo2.png,heart.png,pineapple.png,yinyang.png,bananas.png,cat_paw_prints.png,knight.png,rabbit.png,baseball.png,checkmark.png,ladybug.png,diamond.png,beachball.png,chess.png,leaf.gif,treasure.png,bird.png,chips.png,lemon.gif,wasp.png'.split(',');
+
+cards = conf.cards;
 
 var buildtop10 = function(scoresarray){
     var ol, len = scoresarray.length, li, i, t, sca;
@@ -74,21 +106,22 @@ var clearscores = function(){
 }
 
 var countdown = function(e){
-    var sec = e.duration,
+    var sec = conf.countdown,
         cd,
         s,
-        cui = e.appendel;
+        cui = document.getElementById('countdown');
 
+    cui.replaceChild( document.createTextNode(''), cui.firstChild);
     cui.classList.remove('hide');
 
     /* Add click handler for our cards */
     window.addEventListener('click', onclick ,false);
 
-    /* Add a score for when we need to tally it.*/
     window.addEventListener('tallyscore', ontallyscore, false);
 
-    /* When the game ends and we want to save the score.*/
     window.addEventListener('showscore', onshowscore, false);
+
+    document.body.addEventListener('savescore',onsavescore,false);
 
     /* When we match a pair */
     window.addEventListener('matches', onmatch, false);
@@ -109,7 +142,6 @@ var countdown = function(e){
         cui.replaceChild(s,cui.firstChild);
         sec--;
     }, 800);
-
 }
 
 var doesmatch = function(a,b){
@@ -123,7 +155,6 @@ var doesmatch = function(a,b){
         throw new RangeError('I need two arguments to compare.');
     }
 }
-
 
 var init = function(e){
     /* Add an event listener to the configuration form. */
@@ -207,7 +238,6 @@ var onmatch = function(e){
     isdone();
 }
 
-
 var onreset = function(e){
     var these = document.getElementsByClassName('card');
     for(var i=0; i < these.length; i++){
@@ -215,16 +245,18 @@ var onreset = function(e){
             these[i].classList.remove('flipped');
         }
     }
-
-    // curpair.length = 0;
+    curpair.length = 0;
 }
 
 var onsavescore = function(e){
-    /* If we have Local Storage available, offer the option to save the score */
-    if(Lib.hasLocalStorage()){
+    /* Prevents this function from being called twice */
+    document.body.removeEventListener('savescore',onsavescore);
+
+    if( Lib.hasLocalStorage() ){
         localStorage[ localStorage.length ] = e.score;
         document.getElementById('gettop10').classList.remove('hide');
     }
+
     /* Replay game */
     document.getElementById('replay').addEventListener('click',replay,false);
 }
@@ -274,10 +306,12 @@ var onscoresubmit = function(e){
 }
 
 var onshowscore = function(e){
+
     var tries = document.getElementById('tries').getElementsByTagName('b')[0],
         time = document.getElementById('time').getElementsByTagName('b')[0],
         rate = document.getElementById('percentage').getElementsByTagName('b')[0],
-        points = document.getElementById('points');
+        points = document.getElementById('points'),
+        savescore = new Event('savescore');
 
     if(e.score){
         var sc = Lib.formatinteger(e.score);
@@ -296,9 +330,8 @@ var onshowscore = function(e){
     document.getElementById('overlay').classList.remove('hide');
     document.getElementById('score').classList.remove('hide');
 
-    var savescore = new Event('savescore');
     savescore.score = e.score;
-    window.dispatchEvent(savescore);
+    document.body.dispatchEvent(savescore);
 }
 
 var onstart = function(){
@@ -311,9 +344,9 @@ var onstart = function(){
 var onstop = function(){
     var scoreevt, st = start;
     document.getElementById('deck').classList.add('hide');
-    scoreevt = new Event('tallyscore');
+    scoreevt       = new Event('tallyscore');
     scoreevt.start = start;
-    scoreevt.end = Date.now();
+    scoreevt.end   = Date.now();
     scoreevt.tries = numtries;
     setTimeout(function(){ window.dispatchEvent(scoreevt); },300);
 }
@@ -321,20 +354,18 @@ var onstop = function(){
 var ontallyscore = function(e){
     var howlong, score, sendscore;
     /*
-       calculate the score.
-       pairs / number of tries * length of time * 5.
+    calculate the score.
     */
     howlong = e.end - e.start;
     score = (1000000 * conf.pairs / howlong / e.tries) * 100;
 
-    sendscore = new Event('showscore');
+    sendscore       = new Event('showscore');
     sendscore.score = Math.round( score );
     sendscore.tries = e.tries;
     sendscore.time  = howlong/1000;
     sendscore.successrate = conf.pairs / e.tries;
 
     window.dispatchEvent(sendscore);
-    window.addEventListener('savescore',onsavescore,false);
 }
 
 var replay = function(e){
@@ -353,31 +384,23 @@ var replay = function(e){
     while( deckwrapper.firstElementChild ){
         deckwrapper.removeChild( deckwrapper.firstElementChild );
     }
-
     for(i = 0; i < scores.length; i++){
         scores[i].replaceChild( document.createTextNode(''), scores[i].firstChild );
     }
-
     /* reset numtries */
     numtries = 0;
 
-    cde =  new Event('countdown');
-    cde.duration = conf.countdown;
-    cde.appendel = cd;
-
-    /* Show the config screen - might remove. */
-    cd.classList.remove('hide');
+    /* Launch a new game*/
+    cde =  new Event('submit');
+    config.dispatchEvent(cde);
 }
 
 var shuffle = function(numpairs){
 
-    var cnf = conf;
-    cnf.pairs = numpairs;
-
     /* Shuffle the cards, pick a set,
        copy the set and then shuffle it */
     var c = cards.shuffle(),
-        deck1 = c.splice(0,cnf.pairs),
+        deck1 = c.splice(0,numpairs),
         deck2 = deck1.copy().shuffle(),
         cardA, cardB, valueA, valueB, cd;
 
@@ -391,13 +414,9 @@ var shuffle = function(numpairs){
     window.addEventListener('stoptime', onstop, false);
 
     cd =  new Event('countdown');
-    cd.duration = conf.countdown;
-    cd.appendel = document.getElementById('countdown');
     window.dispatchEvent( cd );
 }
 
-
-window.addEventListener('savescore', onsavescore, false);
 window.addEventListener('DOMContentLoaded', init, false);
 window.addEventListener('countdown', countdown, false);
 
