@@ -197,8 +197,11 @@ button:hover{
     background-image: linear-gradient(top, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
 }
 
-ol{margin: 1rem auto; text-align: right;}
-li{width:13rem;}
+ol{
+    margin: 1rem auto;
+    text-align: right;
+    width:13rem;
+}
 
 .display{font-family: 'SansitaOneRegular'; font-weight:500}
 

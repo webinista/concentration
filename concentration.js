@@ -1,10 +1,7 @@
 /* TO DOs:
 - Add touch support
-- Add a way to inject a style information/sheet if 3D
-  transforms aren't supported
-- Refactor like a mother f*cker.
-- There's a bug sometimes that means only two cards show up.
-  What's that about?
+- Try to get some backward compatibility in here.
+- Refactor for better awesome!
 */
 
 /* Create an individual card */
@@ -39,7 +36,7 @@ function Card(imgsrc){
 var conf = {};
 conf.countdown = 3;
 conf.pairs = 6; // set a default
-// must be an array of images
+/* Must be an array of images */
 conf.cards = 'apple.png,bluestar.png,grapes.png,luckyseven.png,wine.png,bamboo2.png,heart.png,pineapple.png,yinyang.png,bananas.png,cat_paw_prints.png,knight.png,rabbit.png,baseball.png,checkmark.png,ladybug.png,diamond.png,beachball.png,chess.png,leaf.gif,treasure.png,bird.png,chips.png,lemon.gif,wasp.png'.split(',');
 
 var score,
@@ -54,137 +51,26 @@ var score,
     deckwrapper = document.getElementById('deck'),
     tpl;
 
-/* Using event delegation  on the window object here. */
-
-var onclick = function(e){
-    if( e.target.parentNode.classList.contains('card') ){
-
-        var cp = curpair;
-
-        // If we have flipped it over, don't let be flipped again.
-        if( e.target.parentNode.classList.contains('flipped') === false ){
-
-            /* Show the card */
-            e.target.parentNode.classList.add('flipped');
-
-            /* Clear out current pair */
-            if( cp.length >= 2){
-                while( cp.length ){
-                    cp.pop();
-                }
-            }
-
-            cp.push( e.target.parentNode.dataset.cardvalue );
-
-            if( cp.length == 2 ){ numtries++; }
-
-            e.target.parentNode.addEventListener(Lib.transitionend(), function(e){
-                if( cp.length == 2){
-                   doesmatch( cp[0], cp[1] );
-                }
-            },false);
-        }
+var buildtop10 = function(scoresarray){
+    var ol, len = scoresarray.length, li, i, t, sca;
+    ol = document.createElement('ol');
+    for(i = 0; i < 10; i++){
+        isNaN( scoresarray[i] * 1 ) ? sca = '————' : sca = Lib.formatinteger( scoresarray[i] );
+        t = document.createTextNode( sca );
+        li = document.createElement('li');
+        li.appendChild( t );
+        ol.id = 'topscores';
+        ol.appendChild( li );
     }
-
-    if( e.target.classList.contains('close') ){
-        document.getElementById('top10scores').classList.add('hide');
-        document.getElementById('score').classList.remove('hide');
-    }
+    return ol;
 }
 
-var doesmatch = function(a,b){
-    var matches, matchevt;
-
-    if( arguments.length == 2){
-        (a === b) ? matches = 'matches' : matches = 'resetcards';
-        matchevt = new Event( matches );
-        window.dispatchEvent( matchevt );
-    } else {
-        throw new RangeError('I need two arguments to compare.');
-    }
-}
-
-var onmatch = function(e){
-    var these = document.getElementsByClassName('flipped');
-    var len = these.length;
-    for(var i=0; i < len; i++){
-        these[i].classList.add('matched');
-        these[i].addEventListener(Lib.transitionend(), function(e){
-            e.target.classList.add('invisible');
-        },false);
-
-        /* Check whether we should end the game */
-        isdone();
-    }
-    /* Reset the list of flipped items */
-    window.dispatchEvent( new Event('resetcards') );
-
-    /* Check whether we should end the game */
-    isdone();
-}
-
-var onreset = function(e){
-    var these = document.getElementsByClassName('card');
-    for(var i=0; i < these.length; i++){
-        if( these[i].classList.contains('flipped') ){
-            these[i].classList.remove('flipped');
-        }
-    }
-
-    // curpair.length = 0;
-}
-
-var isdone = function(){
-    /* Checks whether we have matched all pairs */
-    var matchedpairs = document.getElementsByClassName('matched').length / 2;
-
-    if(matchedpairs == conf.pairs){
-       window.dispatchEvent( new Event('stoptime') );
-    }
-}
-
-var onstart = function(){
-    document.getElementById('overlay').classList.add('hide');
-    document.getElementById('countdown').classList.add('hide');
-    document.getElementById('deck').classList.remove('hide');
-    start = Date.now();
-}
-
-var onstop = function(){
-    var scoreevt, st = start;
-    document.getElementById('deck').classList.add('hide');
-    scoreevt = new Event('tallyscore');
-    scoreevt.start = start;
-    scoreevt.end = Date.now();
-    scoreevt.tries = numtries;
-    setTimeout(function(){ window.dispatchEvent(scoreevt); },300);
-}
-
-var shuffle = function(numpairs){
-
-    var cnf = conf;
-    cnf.pairs = numpairs;
-
-    /* Shuffle the cards, pick a set,
-       copy the set and then shuffle it */
-    var c = cards.shuffle(),
-        deck1 = c.splice(0,cnf.pairs),
-        deck2 = deck1.copy().shuffle(),
-        cardA, cardB, valueA, valueB, cd;
-
-    for(var j=0; j < deck1.length; j++){
-        deckwrapper.appendChild( new Card(deck1[j]) );
-        deckwrapper.update( new Card(deck2[j]) );
-    }
-
-    /* Add an event handler for the start and stop time events */
-    window.addEventListener('starttime', onstart, false);
-    window.addEventListener('stoptime', onstop, false);
-
-    cd =  new Event('countdown');
-    cd.duration = conf.countdown;
-    cd.appendel = document.getElementById('countdown');
-    window.dispatchEvent( cd );
+var clearscores = function(){
+     var empty10 = [];
+     empty10.length = 10;
+     localStorage.clear();
+     /* Replace the current list. */
+     document.getElementById('top10scores').getElementsByTagName('div')[0].replaceChild( buildtop10( empty10 ), document.getElementsByTagName('ol')[0] );
 }
 
 var countdown = function(e){
@@ -226,63 +112,69 @@ var countdown = function(e){
 
 }
 
-var ontallyscore = function(e){
-    var howlong, score, sendscore;
-    /*
-       calculate the score.
-       pairs / number of tries * length of time * 5.
-    */
-    howlong = e.end - e.start;
-    score = (1000000 * conf.pairs / howlong / e.tries) * 100;
+var doesmatch = function(a,b){
+    var matches, matchevt;
 
-    sendscore = new Event('showscore');
-    sendscore.score = Math.round( score );
-    sendscore.tries = e.tries;
-    sendscore.time  = howlong/1000;
-    sendscore.successrate = conf.pairs / e.tries;
-
-    window.dispatchEvent(sendscore);
-    window.addEventListener('savescore',onsavescore,false);
+    if( arguments.length == 2){
+        (a === b) ? matches = 'matches' : matches = 'resetcards';
+        matchevt = new Event( matches );
+        window.dispatchEvent( matchevt );
+    } else {
+        throw new RangeError('I need two arguments to compare.');
+    }
 }
 
-var onshowscore = function(e){
-    var tries = document.getElementById('tries').getElementsByTagName('b')[0],
-        time = document.getElementById('time').getElementsByTagName('b')[0],
-        rate = document.getElementById('percentage').getElementsByTagName('b')[0],
-        points = document.getElementById('points');
 
-    if(e.score){
-        var sc = Lib.formatinteger(e.score);
-        points.replaceChild( document.createTextNode(sc), points.firstChild );
-    }
-    if(e.tries){
-        tries.replaceChild( document.createTextNode(e.tries), tries.firstChild );
-    }
-    if(e.time){
-        time.replaceChild( document.createTextNode( Lib.hundreths(e.time)+' seconds'), time.firstChild );
-    }
-    if(e.successrate){
-        rate.replaceChild( document.createTextNode( Lib.hundreths( e.successrate*100)+'%' ), rate.firstChild );
-    }
-
-    document.getElementById('overlay').classList.remove('hide');
-    document.getElementById('score').classList.remove('hide');
-
-    var savescore = new Event('savescore');
-    savescore.score = e.score;
-    window.dispatchEvent(savescore);
+var init = function(e){
+    /* Add an event listener to the configuration form. */
+    config.addEventListener('submit', onconfsubmit, false);
 }
 
-var onsavescore = function(e){
-    /* If we have Local Storage available, offer the option to save the score */
-    if(Lib.hasLocalStorage()){
-        localStorage[ localStorage.length ] = e.score;
-        document.getElementById('gettop10').classList.remove('hide');
+var isdone = function(){
+    /* Checks whether we have matched all pairs */
+    var matchedpairs = document.getElementsByClassName('matched').length / 2;
+
+    if(matchedpairs == conf.pairs){
+       window.dispatchEvent( new Event('stoptime') );
     }
-    /* Replay game */
-    document.getElementById('replay').addEventListener('click',replay,false);
 }
 
+/* Using event delegation  on the window object here. */
+var onclick = function(e){
+    if( e.target.parentNode.classList.contains('card') ){
+
+        var cp = curpair;
+
+        // If we have flipped it over, don't let be flipped again.
+        if( e.target.parentNode.classList.contains('flipped') === false ){
+
+            /* Show the card */
+            e.target.parentNode.classList.add('flipped');
+
+            /* Clear out current pair */
+            if( cp.length >= 2){
+                while( cp.length ){
+                    cp.pop();
+                }
+            }
+
+            cp.push( e.target.parentNode.dataset.cardvalue );
+
+            if( cp.length == 2 ){ numtries++; }
+
+            e.target.parentNode.addEventListener(Lib.transitionend(), function(e){
+                if( cp.length == 2){
+                   doesmatch( cp[0], cp[1] );
+                }
+            },false);
+        }
+    }
+
+    if( e.target.classList.contains('close') ){
+        document.getElementById('top10scores').classList.add('hide');
+        document.getElementById('score').classList.remove('hide');
+    }
+}
 
 var onconfsubmit = function(e){
     e.preventDefault();
@@ -296,31 +188,45 @@ var onconfsubmit = function(e){
     document.getElementById('score').addEventListener('submit', onscoresubmit, false);
 }
 
+var onmatch = function(e){
+    var these = document.getElementsByClassName('flipped');
+    var len = these.length;
+    for(var i=0; i < len; i++){
+        these[i].classList.add('matched');
+        these[i].addEventListener(Lib.transitionend(), function(e){
+            e.target.classList.add('invisible');
+        },false);
 
-var replay = function(e){
-    var cards,i,len,cd,scores;
-    e.target.parentNode.parentNode.classList.add('hide');
+        /* Check whether we should end the game */
+        isdone();
+    }
+    /* Reset the list of flipped items */
+    window.dispatchEvent( new Event('resetcards') );
 
-    /* Remove all cards from stack */
-    cards = deckwrapper.getElementsByClassName('card');
-    len   = cards.length;
-    while( deckwrapper.firstElementChild ){
-        deckwrapper.removeChild( deckwrapper.firstElementChild );
+    /* Check whether we should end the game */
+    isdone();
+}
+
+
+var onreset = function(e){
+    var these = document.getElementsByClassName('card');
+    for(var i=0; i < these.length; i++){
+        if( these[i].classList.contains('flipped') ){
+            these[i].classList.remove('flipped');
+        }
     }
 
-    /* Show the config screen - might remove. */
-    document.getElementById('config').classList.remove('hide');
+    // curpair.length = 0;
+}
 
-    cd = document.getElementById('countdown');
-    cd.replaceChild( document.createTextNode(' '), cd.firstChild );
-
-    scores = document.getElementById('score').getElementsByTagName('b');
-
-    for(i = 0; i < scores.length; i++){
-        scores[i].replaceChild( document.createTextNode(''), scores[i].firstChild );
+var onsavescore = function(e){
+    /* If we have Local Storage available, offer the option to save the score */
+    if(Lib.hasLocalStorage()){
+        localStorage[ localStorage.length ] = e.score;
+        document.getElementById('gettop10').classList.remove('hide');
     }
-    /* reset numtries */
-    numtries = 0;
+    /* Replay game */
+    document.getElementById('replay').addEventListener('click',replay,false);
 }
 
 /* Show the Top 10 */
@@ -367,32 +273,129 @@ var onscoresubmit = function(e){
     }
 }
 
-var buildtop10 = function(scoresarray){
-    var ol, len = scoresarray.length, li, i, t, sca;
-    ol = document.createElement('ol');
-    for(i = 0; i < 10; i++){
-        isNaN( scoresarray[i] * 1 ) ? sca = '————' : sca = Lib.formatinteger( scoresarray[i] );
-        t = document.createTextNode( sca );
-        li = document.createElement('li');
-        li.appendChild( t );
-        ol.id = 'topscores';
-        ol.appendChild( li );
+var onshowscore = function(e){
+    var tries = document.getElementById('tries').getElementsByTagName('b')[0],
+        time = document.getElementById('time').getElementsByTagName('b')[0],
+        rate = document.getElementById('percentage').getElementsByTagName('b')[0],
+        points = document.getElementById('points');
+
+    if(e.score){
+        var sc = Lib.formatinteger(e.score);
+        points.replaceChild( document.createTextNode(sc), points.firstChild );
     }
-    return ol;
+    if(e.tries){
+        tries.replaceChild( document.createTextNode(e.tries), tries.firstChild );
+    }
+    if(e.time){
+        time.replaceChild( document.createTextNode( Lib.hundreths(e.time)+' seconds'), time.firstChild );
+    }
+    if(e.successrate){
+        rate.replaceChild( document.createTextNode( Lib.hundreths( e.successrate*100)+'%' ), rate.firstChild );
+    }
+
+    document.getElementById('overlay').classList.remove('hide');
+    document.getElementById('score').classList.remove('hide');
+
+    var savescore = new Event('savescore');
+    savescore.score = e.score;
+    window.dispatchEvent(savescore);
 }
 
-var clearscores = function(){
-     var empty10 = [];
-     empty10.length = 10;
-     localStorage.clear();
-     /* Replace the current list. */
-     document.getElementById('top10scores').getElementsByTagName('div')[0].replaceChild( buildtop10( empty10 ), document.getElementsByTagName('ol')[0] );
+var onstart = function(){
+    document.getElementById('overlay').classList.add('hide');
+    document.getElementById('countdown').classList.add('hide');
+    document.getElementById('deck').classList.remove('hide');
+    start = Date.now();
 }
 
-var init = function(e){
-    /* Add an event listener to the configuration form. */
-    config.addEventListener('submit', onconfsubmit, false);
+var onstop = function(){
+    var scoreevt, st = start;
+    document.getElementById('deck').classList.add('hide');
+    scoreevt = new Event('tallyscore');
+    scoreevt.start = start;
+    scoreevt.end = Date.now();
+    scoreevt.tries = numtries;
+    setTimeout(function(){ window.dispatchEvent(scoreevt); },300);
 }
+
+var ontallyscore = function(e){
+    var howlong, score, sendscore;
+    /*
+       calculate the score.
+       pairs / number of tries * length of time * 5.
+    */
+    howlong = e.end - e.start;
+    score = (1000000 * conf.pairs / howlong / e.tries) * 100;
+
+    sendscore = new Event('showscore');
+    sendscore.score = Math.round( score );
+    sendscore.tries = e.tries;
+    sendscore.time  = howlong/1000;
+    sendscore.successrate = conf.pairs / e.tries;
+
+    window.dispatchEvent(sendscore);
+    window.addEventListener('savescore',onsavescore,false);
+}
+
+var replay = function(e){
+    var cards,
+        i,
+        len,
+        cd = document.getElementById('countdown'),
+        cde,
+        scores = document.getElementById('score').getElementsByTagName('b');
+
+    e.target.parentNode.parentNode.classList.add('hide');
+
+    /* Remove all cards from stack */
+    cards = deckwrapper.getElementsByClassName('card');
+    len   = cards.length;
+    while( deckwrapper.firstElementChild ){
+        deckwrapper.removeChild( deckwrapper.firstElementChild );
+    }
+
+    for(i = 0; i < scores.length; i++){
+        scores[i].replaceChild( document.createTextNode(''), scores[i].firstChild );
+    }
+
+    /* reset numtries */
+    numtries = 0;
+
+    cde =  new Event('countdown');
+    cde.duration = conf.countdown;
+    cde.appendel = cd;
+
+    /* Show the config screen - might remove. */
+    cd.classList.remove('hide');
+}
+
+var shuffle = function(numpairs){
+
+    var cnf = conf;
+    cnf.pairs = numpairs;
+
+    /* Shuffle the cards, pick a set,
+       copy the set and then shuffle it */
+    var c = cards.shuffle(),
+        deck1 = c.splice(0,cnf.pairs),
+        deck2 = deck1.copy().shuffle(),
+        cardA, cardB, valueA, valueB, cd;
+
+    for(var j=0; j < deck1.length; j++){
+        deckwrapper.appendChild( new Card(deck1[j]) );
+        deckwrapper.update( new Card(deck2[j]) );
+    }
+
+    /* Add an event handler for the start and stop time events */
+    window.addEventListener('starttime', onstart, false);
+    window.addEventListener('stoptime', onstop, false);
+
+    cd =  new Event('countdown');
+    cd.duration = conf.countdown;
+    cd.appendel = document.getElementById('countdown');
+    window.dispatchEvent( cd );
+}
+
 
 window.addEventListener('savescore', onsavescore, false);
 window.addEventListener('DOMContentLoaded', init, false);
