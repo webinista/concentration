@@ -29,6 +29,7 @@ NodeList.prototype.setHandler = HTMLCollection.prototype.setHandler = function(e
     }
 };
 
+/* Not sure I like this function. Will remove it. */
 Node.prototype.update = function( newChild, replacedChild ){
     if( this.firstChild === undefined ){
         this.appendChild( newChild );
@@ -71,14 +72,9 @@ window.Lib = (function(global){
 			}
 		},
 		formatinteger:function(number,undefined){
-            var num = number+'',
-                separator,
-                digits,
-                len,
-                groups = [],
-                x = 0;
+            var num = number+'', separator, digits, len, groups = [], x = 0;
 
-            (arguments[1] !== undefined) ? separator = ',' : separator = arguments[1];
+            (arguments[1] !== undefined) ? separator = arguments[1] : separator = ',';
 
             digits = num.split('');
             len =  digits.length;

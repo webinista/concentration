@@ -2,9 +2,9 @@
 - Add touch support
 - Add a way to inject a style information/sheet if 3D
   transforms aren't supported
-- Wrap so can use as an obj?
-- Format scores with commas.
-
+- Refactor like a mother f*cker.
+- There's a bug sometimes that means only two cards show up.
+  What's that about?
 */
 
 /* Create an individual card */
@@ -38,8 +38,8 @@ function Card(imgsrc){
 
 var conf = {};
 conf.countdown = 3;
-conf.pairs = 2; // set a default
-// should be an array of images
+conf.pairs = 6; // set a default
+// must be an array of images
 conf.cards = 'apple.png,bluestar.png,grapes.png,luckyseven.png,wine.png,bamboo2.png,heart.png,pineapple.png,yinyang.png,bananas.png,cat_paw_prints.png,knight.png,rabbit.png,baseball.png,checkmark.png,ladybug.png,diamond.png,beachball.png,chess.png,leaf.gif,treasure.png,bird.png,chips.png,lemon.gif,wasp.png'.split(',');
 
 var score,
@@ -58,9 +58,10 @@ var score,
 
 var onclick = function(e){
     if( e.target.parentNode.classList.contains('card') ){
+
         var cp = curpair;
 
-        /* If we have flipped it over, don't let be flipped again. */
+        // If we have flipped it over, don't let be flipped again.
         if( e.target.parentNode.classList.contains('flipped') === false ){
 
             /* Show the card */
@@ -104,13 +105,17 @@ var doesmatch = function(a,b){
 }
 
 var onmatch = function(e){
-
     var these = document.getElementsByClassName('flipped');
     var len = these.length;
     for(var i=0; i < len; i++){
         these[i].classList.add('matched');
-    }
+        these[i].addEventListener(Lib.transitionend(), function(e){
+            e.target.classList.add('invisible');
+        },false);
 
+        /* Check whether we should end the game */
+        isdone();
+    }
     /* Reset the list of flipped items */
     window.dispatchEvent( new Event('resetcards') );
 
@@ -125,6 +130,8 @@ var onreset = function(e){
             these[i].classList.remove('flipped');
         }
     }
+
+    // curpair.length = 0;
 }
 
 var isdone = function(){
@@ -151,7 +158,6 @@ var onstop = function(){
     scoreevt.end = Date.now();
     scoreevt.tries = numtries;
     setTimeout(function(){ window.dispatchEvent(scoreevt); },300);
-    // window.removeEventListener('click', onclick ,false);
 }
 
 var shuffle = function(numpairs){
@@ -167,14 +173,8 @@ var shuffle = function(numpairs){
         cardA, cardB, valueA, valueB, cd;
 
     for(var j=0; j < deck1.length; j++){
-        deckwrapper.update( new Card(deck1[j]) );
+        deckwrapper.appendChild( new Card(deck1[j]) );
         deckwrapper.update( new Card(deck2[j]) );
-    }
-
-    /* If we have more cards than we need, remove the
-    template node from the stack */
-    if( deckwrapper.getElementsByTagName('figure').length > numpairs * 2 ){
-        deckwrapper.removeChild( deckwrapper.firstElementChild );
     }
 
     /* Add an event handler for the start and stop time events */
@@ -182,31 +182,18 @@ var shuffle = function(numpairs){
     window.addEventListener('stoptime', onstop, false);
 
     cd =  new Event('countdown');
+    cd.duration = conf.countdown;
+    cd.appendel = document.getElementById('countdown');
     window.dispatchEvent( cd );
 }
 
-var countdown = function(){
-    var sec = conf.countdown,
+var countdown = function(e){
+    var sec = e.duration,
         cd,
         s,
-        cui = document.getElementById('countdown');
+        cui = e.appendel;
 
     cui.classList.remove('hide');
-
-    cd = setInterval( function(){
-        /* When the countdown is over...*/
-        if( sec == 0 ){
-            s = document.createTextNode('GO!');
-        } else if( sec == -1){
-            window.dispatchEvent( new Event('starttime') );
-            clearInterval(cd);
-        } else {
-            s = document.createTextNode(sec);
-        }
-        cui.replaceChild(s,cui.firstChild);
-        sec--;
-
-    }, 1000);
 
     /* Add click handler for our cards */
     window.addEventListener('click', onclick ,false);
@@ -222,24 +209,38 @@ var countdown = function(){
 
     /* When we don't match a pair */
     window.addEventListener('resetcards', onreset, false);
+
+    cd = setInterval( function(){
+        /* When the countdown is over...*/
+        if( sec == 0 ){
+            s = document.createTextNode('GO!');
+        } else if( sec == -1){
+            window.dispatchEvent( new Event('starttime') );
+            clearInterval(cd);
+        } else {
+            s = document.createTextNode(sec);
+        }
+        cui.replaceChild(s,cui.firstChild);
+        sec--;
+    }, 800);
+
 }
 
 var ontallyscore = function(e){
-    var p = conf.pairs,
-        score, savescore, howlong, success;
+    var howlong, score, sendscore;
     /*
        calculate the score.
        pairs / number of tries * length of time * 5.
     */
     howlong = e.end - e.start;
-    success = p / e.tries;
-    score = success * howlong * 5;
+    score = (1000000 * conf.pairs / howlong / e.tries) * 100;
 
     sendscore = new Event('showscore');
-    sendscore.score = Math.floor( score );
+    sendscore.score = Math.round( score );
     sendscore.tries = e.tries;
     sendscore.time  = howlong/1000;
-    sendscore.successrate = success;
+    sendscore.successrate = conf.pairs / e.tries;
+
     window.dispatchEvent(sendscore);
     window.addEventListener('savescore',onsavescore,false);
 }
@@ -251,7 +252,8 @@ var onshowscore = function(e){
         points = document.getElementById('points');
 
     if(e.score){
-        points.replaceChild( document.createTextNode(e.score), points.firstChild );
+        var sc = Lib.formatinteger(e.score);
+        points.replaceChild( document.createTextNode(sc), points.firstChild );
     }
     if(e.tries){
         tries.replaceChild( document.createTextNode(e.tries), tries.firstChild );
@@ -285,8 +287,12 @@ var onsavescore = function(e){
 var onconfsubmit = function(e){
     e.preventDefault();
     e.target.classList.add('hide');
-    conf.pairs = e.target['pairs'].value;
-    shuffle( e.target['pairs'].value );
+    if( e.target['pairs'] ){
+        conf.pairs = e.target['pairs'].value;
+    } else {
+        conf.pairs = conf.pairs;
+    }
+    shuffle( conf.pairs );
     document.getElementById('score').addEventListener('submit', onscoresubmit, false);
 }
 
@@ -387,8 +393,6 @@ var init = function(e){
     /* Add an event listener to the configuration form. */
     config.addEventListener('submit', onconfsubmit, false);
 }
-
-
 
 window.addEventListener('savescore', onsavescore, false);
 window.addEventListener('DOMContentLoaded', init, false);
