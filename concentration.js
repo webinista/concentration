@@ -30,8 +30,6 @@ Note that images and fonts are subject to separate licenses.
 - Add touch support
 - Try to get some backward compatibility in here for non 3D transform browsers
 - Refactor for better awesome!
-- Move images to a subdirectory.
-- Fix / mitigate transitions bug that causes some items
 */
 
 /* Create an individual card */
@@ -99,11 +97,13 @@ var buildtop10 = function(scoresarray){
 }
 
 var clearscores = function(){
-     var empty10 = [];
+     var empty10 = [],
+     ts = document.getElementById('top10scores').getElementsByTagName('div')[0];
      empty10.length = 10;
      localStorage.clear();
+
      /* Replace the current list. */
-     document.getElementById('top10scores').getElementsByTagName('div')[0].replaceChild( buildtop10( empty10 ), document.getElementsByTagName('ol')[0] );
+     ts.replaceChild( buildtop10( empty10 ), document.getElementsByTagName('ol')[0] );
 }
 
 var countdown = function(e){

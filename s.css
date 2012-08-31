@@ -70,7 +70,6 @@ body{
      -o-transform-style: preserve-3d;
 -webkit-transform-style: preserve-3d;
         transform-style: preserve-3d;
-
 }
 
 .card, .front, .back{
@@ -239,4 +238,4 @@ h1{font-size:4rem;margin:0;}
 #score p b{font-size:2.2em;display:block;font-family:'DroidSansBold';font-weight:normal}
 #score h1{font-size:1.5em;}
 #score h1 b{font-size:2.2em;}
-#countdown{font-size: 8rem;min-height: 8rem;}
+#countdown{font-size: 8rem;min-height: 10rem;}
