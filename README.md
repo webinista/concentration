@@ -3,7 +3,7 @@ concentration
 
 A version of concentration using CSS3 transforms, the localStorage API, and JavaScript.
 
-index.html, s.css and concentration.js are released under an MIT License.
+index.html, s.css, concentration.js and helpers.js are released under an MIT License.
 
 With the exception of cardback2.gif, image files are believed to be released to the public domain and were downloaded from OpenClipArt.org. If this isn't the case, contact me, and I'll remove it from the repository.
 
