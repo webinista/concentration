@@ -1,5 +1,33 @@
-/* Shuffle function from http://stackoverflow.com/questions/962802/is-it-correct-to-use-javascript-array-sort-method-for-shuffling */
+/*
+MemoryConcentration version 1.0
+Copyright 2012 Tiffany B. Brown
+http://tiffanybbrown.com
 
+Released under an MIT license.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Note that images and fonts are subject to separate licenses.
+*/
+
+/* Shuffle function from http://stackoverflow.com/questions/962802/is-it-correct-to-use-javascript-array-sort-method-for-shuffling */
 Array.prototype.shuffle = function() {
     var tmp, current, top = this.length;
     if(top) {
@@ -20,25 +48,6 @@ Array.prototype.copy = function(){
     }
     return copy;
 };
-
-
-// Setting on both NodeList and HTMLCollection
-NodeList.prototype.setHandler = HTMLCollection.prototype.setHandler = function(event, func, useCapture){
-    for(var i =0; i < this.length; i++){
-        this[i].addEventListener(event, func, useCapture );
-    }
-};
-
-/* Not sure I like this function. Will remove it. */
-Node.prototype.update = function( newChild, replacedChild ){
-    if( this.firstChild === undefined ){
-        this.appendChild( newChild );
-    } else if( replacedChild === undefined ){
-        this.appendChild( newChild );
-    } else {
-        this.replaceChild( newChild, replacedChild );
-    }
-}
 
 window.Lib = (function(global){
     return {
