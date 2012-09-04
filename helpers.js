@@ -119,6 +119,9 @@ window.Lib = (function(global){
             } else {
                 return false;
             }
+        },
+        hasClassList:function(){
+            return document.body.classList !== undefined;
         }
     }
 })(window);
