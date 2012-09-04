@@ -70,9 +70,6 @@ var conf = {
     transend = Lib.transitionend(),
     numtries = 0;
 
-console.log( conf.cards.length );
-console.log( conf.cards.shuffle().length );
-
 var buildtop10 = function(scoresarray){
     var ol, len = scoresarray.length, li, i, t, sca;
     ol = document.createElement('ol');
