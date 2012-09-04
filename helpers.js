@@ -93,6 +93,32 @@ window.Lib = (function(global){
                x++;
             }
             return groups.reverse().join(separator);
+        },
+        has3d:function(){
+            var el = document.createElement('p'), t, has3d,
+            transforms = {
+                'WebkitTransform':'-webkit-transform',
+                'OTransform':'-o-transform',
+                'MSTransform':'-ms-transform',
+                'MozTransform':'transform',
+                'Transform':'transform'
+            };
+
+            /* Add it to the body to get the computed style.*/
+            document.body.insertBefore(el, document.body.lastChild);
+
+            for(t in transforms){
+                if( el.style[t] !== undefined ){
+                    el.style[ transforms[t] ] = 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)';
+                    has3d = global.getComputedStyle(el).getPropertyValue( transforms[t] );
+                }
+            }
+
+            if( has3d !== undefined ){
+                return has3d !== 'none';
+            } else {
+                return false;
+            }
         }
     }
 })(window);
