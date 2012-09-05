@@ -200,6 +200,7 @@ select{
 button{
     border:3px solid #537f94;
     font-size: 2em;
+    line-height:1;
     color:#fff;
     box-shadow: 2px 2px 0.5rem #666, inset 1px 1px .31rem #666;
     border-radius:30px;
