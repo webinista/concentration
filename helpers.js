@@ -49,79 +49,78 @@ Array.prototype.copy = function(){
     return copy;
 };
 
-window.Lib = (function(global){
-    return {
-        hasLocalStorage: function(){
-            return ( global.localStorage !== undefined ) && ( Object.prototype.toString.call(global.localStorage) === "[object Storage]");
-        },
-        hundreths: function(number){
-            number += '';
-            if( number.indexOf('.') > -1 ){
-               var splitondecimal = number.split('.');
-               splitondecimal[1] = splitondecimal[1].substr(0,2);
-               return splitondecimal.join('.') * 1;
-            } else {
-                return number;
-            }
+function Lib(){}
 
-        },
-        transitionend: function(){
-			var t, transitions, el = document.createElement('fakeEl');
-			transitions = {
-			    'OTransition':'oTransitionEnd',
-			    'MSTransition':'msTransitionEnd',
-			    'MozTransition':'transitionend',
-			    'WebkitTransition':'webkitTransitionEnd',
-			    'transition':'transitionEnd'
-		    }
-			for(t in transitions){
-				if( el.style[t] !== undefined ){
-					return transitions[t];
-				}
-			}
-		},
-		formatinteger:function(number,undefined){
-            var num = number+'', separator, digits, len, groups = [], x = 0;
-
-            (arguments[1] !== undefined) ? separator = arguments[1] : separator = ',';
-
-            digits = num.split('');
-            len =  digits.length;
-
-            while(x < len/3 ){
-               groups[x] = digits.splice(-3).join('');
-               x++;
-            }
-            return groups.reverse().join(separator);
-        },
-        has3d:function(){
-            var el = document.createElement('p'), t, has3d,
-            transforms = {
-                'WebkitTransform':'-webkit-transform',
-                'OTransform':'-o-transform',
-                'MSTransform':'-ms-transform',
-                'MozTransform':'transform',
-                'Transform':'transform'
-            };
-
-            /* Add it to the body to get the computed style.*/
-            document.body.insertBefore(el, document.body.lastChild);
-
-            for(t in transforms){
-                if( el.style[t] !== undefined ){
-                    el.style[ transforms[t] ] = 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)';
-                    has3d = global.getComputedStyle(el).getPropertyValue( transforms[t] );
-                }
-            }
-
-            if( has3d !== undefined ){
-                return has3d !== 'none';
-            } else {
-                return false;
-            }
-        },
-        hasClassList:function(){
-            return document.body.classList !== undefined;
+Lib.prototype.hasLocalStorage = function(){
+    return ( global.localStorage !== undefined ) && ( Object.prototype.toString.call(global.localStorage) === "[object Storage]");
+}
+Lib.prototype.hundreths = function(number){
+    number += '';
+    if( number.indexOf('.') > -1 ){
+       var splitondecimal = number.split('.');
+       splitondecimal[1] = splitondecimal[1].substr(0,2);
+       return splitondecimal.join('.') * 1;
+    } else {
+        return number;
+    }
+}
+Lib.prototype.transitionend = function(){
+    var t, transitions, el = document.createElement('fakeEl');
+    transitions = {
+        'OTransition':'oTransitionEnd',
+        'MSTransition':'msTransitionEnd',
+        'MozTransition':'transitionend',
+        'WebkitTransition':'webkitTransitionEnd',
+        'transition':'transitionEnd'
+    }
+    for(t in transitions){
+        if( el.style[t] !== undefined ){
+            return transitions[t];
         }
     }
-})(window);
+}
+Lib.prototype.formatinteger = function(number,undefined){
+    var num = number+'', separator, digits, len, groups = [], x = 0;
+
+    (arguments[1] !== undefined) ? separator = arguments[1] : separator = ',';
+
+    digits = num.split('');
+    len =  digits.length;
+
+    while(x < len/3 ){
+       groups[x] = digits.splice(-3).join('');
+       x++;
+    }
+    return groups.reverse().join(separator);
+}
+Lib.prototype.has3d = function(){
+    var el = document.createElement('p'), t, has3d,
+    transforms = {
+        'WebkitTransform':'-webkit-transform',
+        'OTransform':'-o-transform',
+        'MSTransform':'-ms-transform',
+        'MozTransform':'transform',
+        'Transform':'transform'
+    };
+
+    /* Add it to the body to get the computed style.*/
+    document.body.insertBefore(el, document.body.lastChild);
+
+    for(t in transforms){
+        if( el.style[t] !== undefined ){
+            el.style[ transforms[t] ] = 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)';
+            has3d = global.getComputedStyle(el).getPropertyValue( transforms[t] );
+        }
+    }
+
+    if( has3d !== undefined ){
+        return has3d !== 'none';
+    } else {
+        return false;
+    }
+}
+Lib.prototype.hasClassList = function(){
+    return document.body.classList !== undefined;
+}
+
+window.Lib = new Lib();
