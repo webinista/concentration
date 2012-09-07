@@ -52,7 +52,7 @@ Array.prototype.copy = function(){
 function Lib(){}
 
 Lib.prototype.hasLocalStorage = function(){
-    return ( global.localStorage !== undefined ) && ( Object.prototype.toString.call(global.localStorage) === "[object Storage]");
+    return ( window.localStorage !== undefined ) && ( Object.prototype.toString.call(window.localStorage) === "[object Storage]");
 }
 Lib.prototype.hundreths = function(number){
     number += '';
@@ -109,7 +109,7 @@ Lib.prototype.has3d = function(){
     for(t in transforms){
         if( el.style[t] !== undefined ){
             el.style[ transforms[t] ] = 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)';
-            has3d = global.getComputedStyle(el).getPropertyValue( transforms[t] );
+            has3d = window.getComputedStyle(el).getPropertyValue( transforms[t] );
         }
     }
 
