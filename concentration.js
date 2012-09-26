@@ -30,16 +30,16 @@ Note that images and fonts are subject to separate licenses.
 'use strict';
 
 /* Create an individual card */
-function Card(imgsrc, path){
+function Card(imgsrc){
     /* Creates:
-    <figure class="card">
-        <div class="front"></div>
-        <div class="back">&nbsp;</div>
-    </figure>
+    <div class="card" data-cardvalue="imgsrc">
+        <div class="front"><img src="imgsrc"></div>
+        <div class="back"></div>
+    </div>
     */
     var front, back, card, img = new Image();
 
-    img.src = path+imgsrc;
+    img.src = imgsrc;
 
     front = document.createElement('div');
     front.setAttribute('class','front');
@@ -48,7 +48,7 @@ function Card(imgsrc, path){
     back = front.cloneNode(false);
     back.setAttribute('class','back');
 
-    card = document.createElement('figure');
+    card = document.createElement('div');
     card.setAttribute('data-cardvalue',img.src);
     card.setAttribute('class','card');
     card.appendChild(front);
@@ -120,7 +120,7 @@ var countdown = function(e){
         if( sec == 0 ){
             s = document.createTextNode('GO!');
         } else if( sec == -1){
-            window.dispatchEvent( new Event('starttime') );
+            window.dispatchEvent( new CustomEvent('starttime') );
             clearInterval(cd);
         } else {
             s = document.createTextNode(sec);
@@ -135,7 +135,7 @@ var doesmatch = function(a,b){
 
     if( arguments.length == 2){
         (a === b) ? matches = 'matches' : matches = 'resetcards';
-        matchevt = new Event( matches );
+        matchevt = new CustomEvent( matches );
         window.dispatchEvent( matchevt );
     } else {
         throw new RangeError('I need two arguments to compare.');
@@ -154,7 +154,7 @@ var isdone = function(){
     var matchedpairs = document.getElementsByClassName('matched').length / 2;
 
     if(matchedpairs == conf.pairs){
-       window.dispatchEvent( new Event('stoptime') );
+       window.dispatchEvent( new CustomEvent('stoptime') );
     }
 }
 
@@ -188,7 +188,7 @@ var onclick = function(e){
 var onconfsubmit = function(e){
     e.preventDefault();
     e.target.classList.add('hide');
-    shuff( conf.pairs );
+    shuff( conf.cards, conf.pairs );
     document.getElementById('score').addEventListener('submit', onscoresubmit, false);
 }
 
@@ -215,7 +215,7 @@ var onmatch = function(e){
     }
 
     /* Reset the list of flipped items */
-    window.dispatchEvent( new Event('resetcards') );
+    window.dispatchEvent( new CustomEvent('resetcards') );
 
     /* Check whether we should end the game */
     isdone();
@@ -295,7 +295,7 @@ var onshowscore = function(e){
         time = document.getElementById('time').getElementsByTagName('b')[0],
         rate = document.getElementById('percentage').getElementsByTagName('b')[0],
         points = document.getElementById('points'),
-        savescore = new Event('savescore');
+        savescore = new CustomEvent('savescore');
 
     if(e.score){
         var sc = Lib.formatinteger(e.score);
@@ -328,7 +328,7 @@ var onstart = function(){
 var onstop = function(){
     var scoreevt;
     document.getElementById('deck').classList.add('hide');
-    scoreevt       = new Event('tallyscore');
+    scoreevt       = new CustomEvent('tallyscore');
     scoreevt.start = start;
     scoreevt.end   = Date.now();
     scoreevt.tries = numtries;
@@ -342,8 +342,7 @@ var ontallyscore = function(e){
     */
     howlong = e.end - e.start;
     score   = (1000000 * conf.pairs / howlong / e.tries) * 100;
-
-    sendscore = new Event('showscore');
+    sendscore = new CustomEvent('showscore');
 
     // If it's an infinite number, there's probably an error.
     if( score === Number.POSITIVE_INFINITY ){
@@ -390,25 +389,25 @@ var replay = function(e){
     config.dispatchEvent(cde);
 }
 
-var shuff = function(numpairs){
+function shuff(deck, numpairs){
     /* Shuffle the cards, pick a set,
        copy the set and then shuffle it */
-    var c = conf.cards.shuffle(),
-        deck1 = c.slice(0,numpairs),
+    var c = deck.shuffle(),
+        deck1 = c.slice(0, numpairs),
         deck2 = deck1.copy().shuffle(),
         cd, j,
         deckwrapper = document.getElementById('deck');
 
     for(j=0; j < deck1.length; j++){
-        deckwrapper.appendChild( new Card(deck1[j],conf.imgdir) );
-        deckwrapper.appendChild( new Card(deck2[j],conf.imgdir) );
+        deckwrapper.appendChild( new Card(conf.imgdir+deck1[j]) );
+        deckwrapper.appendChild( new Card(conf.imgdir+deck2[j]) );
     }
 
     /* Add an event handler for the start and stop time events */
     window.addEventListener('starttime', onstart, false);
     window.addEventListener('stoptime', onstop, false);
 
-    cd =  new Event('countdown');
+    cd =  new CustomEvent('countdown');
     window.dispatchEvent( cd );
 }
 
