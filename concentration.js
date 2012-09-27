@@ -29,8 +29,27 @@ Note that images and fonts are subject to separate licenses.
 
 'use strict';
 
-/* Create an individual card */
-function Card(imgsrc){
+var Concentration,
+    conf = {
+        countdown:3,
+        pairs:6,
+        imgpath:'images/',
+        deck:'apple.png,bluestar.png,grapes.png,luckyseven.png,wine.png,bamboo2.png,heart.png,pineapple.png,yinyang.png,bananas.png,cat_paw_prints.png,knight.png,rabbit.png,baseball.png,checkmark.png,ladybug.png,diamond.png,beachball.png,chess.png,leaf.gif,treasure.png,bird.png,chips.png,lemon.gif,wasp.png'.split(',')
+    },
+    curpair = [],
+    start,
+    end,
+    transend = Lib.transitionend(),
+    numtries = 0;
+
+function Concentration(config){
+    this.deck  = config.deck;
+    this.pairs = config.pairs;
+    this.countdownfrom = config.countdown;
+    this.imgpath = config.imgpath;
+}
+
+Concentration.prototype.makecard = function(imgsrc){
     /* Creates:
     <div class="card" data-cardvalue="imgsrc">
         <div class="front"><img src="imgsrc"></div>
@@ -56,21 +75,7 @@ function Card(imgsrc){
 
     return card;
 }
-
-
-var conf = {
-        countdown:3,
-        pairs:6,
-        imgdir:'images/',
-        cards:'apple.png,bluestar.png,grapes.png,luckyseven.png,wine.png,bamboo2.png,heart.png,pineapple.png,yinyang.png,bananas.png,cat_paw_prints.png,knight.png,rabbit.png,baseball.png,checkmark.png,ladybug.png,diamond.png,beachball.png,chess.png,leaf.gif,treasure.png,bird.png,chips.png,lemon.gif,wasp.png'.split(',')
-    },
-    curpair = [],
-    start,
-    end,
-    transend = Lib.transitionend(),
-    numtries = 0;
-
-var buildtop10 = function(scoresarray){
+Concentration.prototype.buildtop10 = function(scoresarray){
     var ol, len = scoresarray.length, li, i, t, sca;
     ol = document.createElement('ol');
     for(i = 0; i < 10; i++){
@@ -83,18 +88,57 @@ var buildtop10 = function(scoresarray){
     }
     return ol;
 }
-
-var clearscores = function(){
+Concentration.prototype.clearscores = function(){
+    console.log(this);
      var empty10 = [],
      ts = document.getElementById('top10scores').getElementsByTagName('div')[0];
      empty10.length = 10;
      localStorage.clear();
 
      /* Replace the current list. */
-     ts.replaceChild( buildtop10( empty10 ), document.getElementsByTagName('ol')[0] );
+     ts.replaceChild( this.buildtop10( empty10 ), document.getElementsByTagName('ol')[0] );
 }
+Concentration.prototype.doesmatch = function(a,b){
+    var matches, matchevt;
 
-var countdown = function(e){
+    if( arguments.length == 2){
+        (a === b) ? matches = 'matches' : matches = 'resetcards';
+        matchevt = new CustomEvent( matches );
+        window.dispatchEvent( matchevt );
+    } else {
+        throw new RangeError('I need two arguments to compare.');
+    }
+}
+Concentration.prototype.isdone = function(){
+    /* Checks whether we have matched all pairs */
+    var matchedpairs = document.getElementsByClassName('matched').length / 2;
+
+    if(matchedpairs == conf.pairs){
+       window.dispatchEvent( new CustomEvent('stoptime') );
+    }
+}
+Concentration.prototype.deal = function(){
+    /* Shuffle the cards, pick a set,
+       copy the set and then shuffle it */
+    var c = this.deck.shuffle(),
+        deck1 = c.slice(0, this.pairs),
+        deck2 = deck1.copy().shuffle(),
+        cd, j,
+        deckwrapper = document.getElementById('deck');
+
+    for(j=0; j < deck1.length; j++){
+        deckwrapper.appendChild( Concentration.makecard(this.imgpath + deck1[j]) );
+        deckwrapper.appendChild( Concentration.makecard(this.imgpath + deck2[j]) );
+    }
+
+    /* Add an event handler for the start and stop time events */
+    window.addEventListener('starttime', onstart, false);
+    window.addEventListener('stoptime', onstop, false);
+
+    cd =  new CustomEvent('countdown');
+    window.dispatchEvent( cd );
+}
+Concentration.prototype.countdown = function(){
     var sec = conf.countdown,
         cd,
         s,
@@ -102,18 +146,6 @@ var countdown = function(e){
 
     cui.replaceChild( document.createTextNode(''), cui.firstChild);
     cui.classList.remove('hide');
-
-    document.body.addEventListener('click', onclick ,false);
-    document.body.addEventListener('savescore',onsavescore,false);
-
-    window.addEventListener('tallyscore', ontallyscore, false);
-    window.addEventListener('showscore', onshowscore, false);
-
-    /* When we match a pair */
-    window.addEventListener('matches', onmatch, false);
-
-    /* When we don't match a pair */
-    window.addEventListener('resetcards', onreset, false);
 
     cd = setInterval( function(){
         /* When the countdown is over...*/
@@ -130,33 +162,32 @@ var countdown = function(e){
     }, 800);
 }
 
-var doesmatch = function(a,b){
-    var matches, matchevt;
 
-    if( arguments.length == 2){
-        (a === b) ? matches = 'matches' : matches = 'resetcards';
-        matchevt = new CustomEvent( matches );
-        window.dispatchEvent( matchevt );
-    } else {
-        throw new RangeError('I need two arguments to compare.');
-    }
+var countdown = function(e){
+
+    Concentration.countdown();
+
+    document.body.addEventListener('click', onclick ,false);
+    document.body.addEventListener('savescore',onsavescore,false);
+    window.addEventListener('tallyscore', ontallyscore, false);
+    window.addEventListener('showscore', onshowscore, false);
+
+    /* When we match a pair */
+    window.addEventListener('matches', onmatch, false);
+
+    /* When we don't match a pair */
+    window.addEventListener('resetcards', onreset, false);
 }
 
-var init = function(e){
+
+function init(){
+    Concentration = new Concentration(conf);
+
     /* Add an event listener to the configuration form. */
-    var config = document.getElementById('config');
-    config.addEventListener('submit', onconfsubmit, false);
+    document.getElementById('config').addEventListener('submit', onconfsubmit, false);
     window.addEventListener('countdown', countdown, false);
 }
 
-var isdone = function(){
-    /* Checks whether we have matched all pairs */
-    var matchedpairs = document.getElementsByClassName('matched').length / 2;
-
-    if(matchedpairs == conf.pairs){
-       window.dispatchEvent( new CustomEvent('stoptime') );
-    }
-}
 
 /* Using event delegation here. */
 var onclick = function(e){
@@ -188,7 +219,7 @@ var onclick = function(e){
 var onconfsubmit = function(e){
     e.preventDefault();
     e.target.classList.add('hide');
-    shuff( conf.cards, conf.pairs );
+    Concentration.deal( conf.cards, conf.pairs );
     document.getElementById('score').addEventListener('submit', onscoresubmit, false);
 }
 
@@ -196,7 +227,7 @@ var onflip = function(e){
     e.preventDefault();
     var cp = curpair;
     if( cp.length == 2){
-       doesmatch( cp[0], cp[1]);
+       Concentration.doesmatch( cp[0], cp[1]);
     }
     e.target.removeEventListener(transend,onflip,true);
 }
@@ -218,7 +249,7 @@ var onmatch = function(e){
     window.dispatchEvent( new CustomEvent('resetcards') );
 
     /* Check whether we should end the game */
-    isdone();
+    Concentration.isdone();
 }
 
 var onreset = function(e){
@@ -264,7 +295,7 @@ var onscoresubmit = function(e){
 
     /* Sort scores */
     top10 = scores.sort( function(a,b){ return b - a; }).splice(0,10); // should this be a slice instead?
-    list = buildtop10( top10 );
+    list = Concentration.buildtop10( top10 );
     top10scr = document.getElementById('top10scores').getElementsByTagName('div')[0];
 
     /* Is this the first time we're inserting? If not, replace the current list. */
@@ -278,7 +309,9 @@ var onscoresubmit = function(e){
     document.getElementById('score').classList.add('hide');
 
     /* Reset scores */
-    document.getElementById('resethighscores').addEventListener('click',clearscores,false);
+    document.getElementById('resethighscores').addEventListener('click',function(){
+        Concentration.clearscores()
+    },false);
 
     /* Clear old scores so we can rewrite the current top 10 */
     localStorage.clear();
@@ -389,29 +422,8 @@ var replay = function(e){
     config.dispatchEvent(cde);
 }
 
-function shuff(deck, numpairs){
-    /* Shuffle the cards, pick a set,
-       copy the set and then shuffle it */
-    var c = deck.shuffle(),
-        deck1 = c.slice(0, numpairs),
-        deck2 = deck1.copy().shuffle(),
-        cd, j,
-        deckwrapper = document.getElementById('deck');
-
-    for(j=0; j < deck1.length; j++){
-        deckwrapper.appendChild( new Card(conf.imgdir+deck1[j]) );
-        deckwrapper.appendChild( new Card(conf.imgdir+deck2[j]) );
-    }
-
-    /* Add an event handler for the start and stop time events */
-    window.addEventListener('starttime', onstart, false);
-    window.addEventListener('stoptime', onstop, false);
-
-    cd =  new CustomEvent('countdown');
-    window.dispatchEvent( cd );
-}
-
 window.addEventListener('DOMContentLoaded', init, false);
 window.addEventListener('unload', function(e){
     window.removeEventListener('DOMContentLoaded',init,false);
 }, false);
+
