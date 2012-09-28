@@ -29,7 +29,7 @@ Note that images and fonts are subject to separate licenses.
 
 'use strict';
 
-var Concentration,
+var conc,
     conf = {
         countdown:3,
         pairs:6,
@@ -127,8 +127,8 @@ Concentration.prototype.deal = function(){
         deckwrapper = document.getElementById('deck');
 
     for(j=0; j < deck1.length; j++){
-        deckwrapper.appendChild( Concentration.makecard(this.imgpath + deck1[j]) );
-        deckwrapper.appendChild( Concentration.makecard(this.imgpath + deck2[j]) );
+        deckwrapper.appendChild( conc.makecard(this.imgpath + deck1[j]) );
+        deckwrapper.appendChild( conc.makecard(this.imgpath + deck2[j]) );
     }
 
     /* Add an event handler for the start and stop time events */
@@ -162,30 +162,16 @@ Concentration.prototype.countdown = function(){
     }, 800);
 }
 
-
-var countdown = function(e){
-
-    Concentration.countdown();
-
-    document.body.addEventListener('click', onclick ,false);
-    document.body.addEventListener('savescore',onsavescore,false);
-    window.addEventListener('tallyscore', ontallyscore, false);
-    window.addEventListener('showscore', onshowscore, false);
-
-    /* When we match a pair */
-    window.addEventListener('matches', onmatch, false);
-
-    /* When we don't match a pair */
-    window.addEventListener('resetcards', onreset, false);
+Concentration.prototype.start = function(){
+    return Date.now();
+}
+Concentration.prototype.stop = function(){
+    return Date.now();
 }
 
-
 function init(){
-    Concentration = new Concentration(conf);
-
-    /* Add an event listener to the configuration form. */
     document.getElementById('config').addEventListener('submit', onconfsubmit, false);
-    window.addEventListener('countdown', countdown, false);
+    window.addEventListener('countdown', oncountdown, false);
 }
 
 
@@ -193,18 +179,22 @@ function init(){
 var onclick = function(e){
     var cp = curpair,
         cur = e.target.parentNode,
-        curclasses = e.target.parentNode.classList;
+        curclasses = cur.classList,
+        onflip = function(e){
+            e.preventDefault();
+            var cp = curpair;
+            if( cp.length == 2){
+                conc.doesmatch( cp[0], cp[1]);
+            }
+            e.target.removeEventListener(transend,onflip,true);
+        };
 
     if( curclasses.contains('card') ){
-
-        // If we have flipped it over, don't let be flipped again.
+        /* Don't flip twice */
         if( curclasses.contains('flipped') === false ){
-
             curclasses.add('flipped');
             cp.push( cur.dataset.cardvalue );
-
             if( cp.length == 2 ){ numtries++; }
-
             cur.addEventListener(transend, onflip, true);
         }
     }
@@ -214,27 +204,54 @@ var onclick = function(e){
         document.getElementById('top10scores').classList.add('hide');
         document.getElementById('score').classList.remove('hide');
     }
+
+    console.log( e.target.classList );
+    console.log( e.currentTarget.classList );
 }
 
 var onconfsubmit = function(e){
     e.preventDefault();
     e.target.classList.add('hide');
-    Concentration.deal( conf.cards, conf.pairs );
+    conc = new Concentration(conf);
+    conc.deal( conf.cards, conf.pairs );
     document.getElementById('score').addEventListener('submit', onscoresubmit, false);
 }
 
-var onflip = function(e){
-    e.preventDefault();
-    var cp = curpair;
-    if( cp.length == 2){
-       Concentration.doesmatch( cp[0], cp[1]);
+var oncountdown = function(e){
+    conc.countdown();
+    window.addEventListener('click', onclick, false);
+    window.addEventListener('savescore',onsavescore,false);
+    window.addEventListener('tallyscore', ontallyscore, false);
+    window.addEventListener('showscore', onshowscore, false);
+    window.addEventListener('matches', onmatch, false);
+    window.addEventListener('resetcards', onreset, false);
+}
+
+var ontallyscore = function(e){
+        var howlong, score, sendscore;
+        /*
+        calculate the score.
+        */
+        howlong   = e.end - e.start;
+        score     = (1000000 * conf.pairs / howlong / e.tries) * 100;
+        sendscore = new CustomEvent('showscore');
+
+    /* If it's an infinite number, there's probably an error. */
+    if( score === Number.POSITIVE_INFINITY ){
+        /* Will improve later. */
+        alert('Unable to calculate a score. This can happen if the game has run for too long.');
+    } else {
+        sendscore.score = Math.round( score );
+        sendscore.tries = e.tries;
+        sendscore.time  = howlong/1000;
+        sendscore.successrate = conf.pairs / e.tries;
+        window.dispatchEvent(sendscore);
     }
-    e.target.removeEventListener(transend,onflip,true);
 }
 
 var onmatch = function(e){
-    var these = document.getElementsByClassName('flipped'),
-        len = these.length,
+    var these      = document.getElementsByClassName('flipped'),
+        len        = these.length,
         onmatchend = function(t){
             t.target.classList.add('invisible');
             t.target.removeEventListener(transend,onmatchend,false);
@@ -249,7 +266,7 @@ var onmatch = function(e){
     window.dispatchEvent( new CustomEvent('resetcards') );
 
     /* Check whether we should end the game */
-    Concentration.isdone();
+    conc.isdone();
 }
 
 var onreset = function(e){
@@ -265,7 +282,7 @@ var onreset = function(e){
 
 var onsavescore = function(e){
     /* Prevents this function from being called twice */
-    document.body.removeEventListener('savescore',onsavescore);
+    window.removeEventListener('savescore',onsavescore);
 
     if( Lib.hasLocalStorage() ){
         localStorage[ localStorage.length ] = e.score;
@@ -295,7 +312,7 @@ var onscoresubmit = function(e){
 
     /* Sort scores */
     top10 = scores.sort( function(a,b){ return b - a; }).splice(0,10); // should this be a slice instead?
-    list = Concentration.buildtop10( top10 );
+    list = conc.buildtop10( top10 );
     top10scr = document.getElementById('top10scores').getElementsByTagName('div')[0];
 
     /* Is this the first time we're inserting? If not, replace the current list. */
@@ -310,7 +327,7 @@ var onscoresubmit = function(e){
 
     /* Reset scores */
     document.getElementById('resethighscores').addEventListener('click',function(){
-        Concentration.clearscores()
+        conc.clearscores();
     },false);
 
     /* Clear old scores so we can rewrite the current top 10 */
@@ -324,10 +341,10 @@ var onscoresubmit = function(e){
 
 var onshowscore = function(e){
 
-    var tries = document.getElementById('tries').getElementsByTagName('b')[0],
-        time = document.getElementById('time').getElementsByTagName('b')[0],
-        rate = document.getElementById('percentage').getElementsByTagName('b')[0],
-        points = document.getElementById('points'),
+    var tries     = document.getElementById('tries').getElementsByTagName('b')[0],
+        time      = document.getElementById('time').getElementsByTagName('b')[0],
+        rate      = document.getElementById('percentage').getElementsByTagName('b')[0],
+        points    = document.getElementById('points'),
         savescore = new CustomEvent('savescore');
 
     if(e.score){
@@ -348,14 +365,14 @@ var onshowscore = function(e){
     document.getElementById('score').classList.remove('hide');
 
     savescore.score = e.score;
-    document.body.dispatchEvent(savescore);
+    window.dispatchEvent(savescore);
 }
 
 var onstart = function(){
     document.getElementById('overlay').classList.add('hide');
     document.getElementById('countdown').classList.add('hide');
     document.getElementById('deck').classList.remove('hide');
-    start = Date.now();
+    start = conc.start();
 }
 
 var onstop = function(){
@@ -363,31 +380,9 @@ var onstop = function(){
     document.getElementById('deck').classList.add('hide');
     scoreevt       = new CustomEvent('tallyscore');
     scoreevt.start = start;
-    scoreevt.end   = Date.now();
+    scoreevt.end   = conc.stop();
     scoreevt.tries = numtries;
     setTimeout(function(){ window.dispatchEvent(scoreevt); },300);
-}
-
-var ontallyscore = function(e){
-    var howlong, score, sendscore;
-    /*
-    calculate the score.
-    */
-    howlong = e.end - e.start;
-    score   = (1000000 * conf.pairs / howlong / e.tries) * 100;
-    sendscore = new CustomEvent('showscore');
-
-    // If it's an infinite number, there's probably an error.
-    if( score === Number.POSITIVE_INFINITY ){
-        // Will improve later.
-        alert('Unable to calculate a score. This can happen if the game has run for too long.');
-    } else {
-        sendscore.score = Math.round( score );
-        sendscore.tries = e.tries;
-        sendscore.time  = howlong/1000;
-        sendscore.successrate = conf.pairs / e.tries;
-        window.dispatchEvent(sendscore);
-    }
 }
 
 var replay = function(e){
@@ -426,4 +421,3 @@ window.addEventListener('DOMContentLoaded', init, false);
 window.addEventListener('unload', function(e){
     window.removeEventListener('DOMContentLoaded',init,false);
 }, false);
-

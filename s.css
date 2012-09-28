@@ -50,14 +50,9 @@ body{
     width: 121px;
     height: 121px;
     float:left;
-    margin:0 2rem 1rem 0;
-    font-size: 2rem;
-    text-align:center;
+    margin:0 2.5rem 2.5rem 0;
     cursor:pointer;
     position:relative;
-    border-radius:10px;
-    box-shadow:0 0 10px #999;
-    border: 10px solid rgba(255,255,255,1);
 
    -moz-transition:    -moz-transform 300ms ease-in-out 500ms;
     -ms-transition:     -ms-transform 300ms ease-in-out 500ms;
@@ -93,9 +88,12 @@ body{
       -o-backface-visibility: hidden;
  -webkit-backface-visibility: hidden;
          backface-visibility: hidden;
+    border: 10px solid rgba(255,255,255,1);
+      box-shadow:0 0 10px #999;
+      border-radius:10px;
 }
 
-.front{background: #fff; display:block;}
+.front, .back img{background: #fff; display:block;}
 .back{background: #BCC1D1 url(images/cardback2.gif);}
 
 .card.flipped{
@@ -112,6 +110,8 @@ body{
         transition:         transform 300ms ease-in-out;
 
 }
+
+.back img{margin:auto;}
 
 .card .front{
    -moz-transform: rotate3d(-100,-100,0,-180deg);
