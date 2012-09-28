@@ -187,6 +187,19 @@ Concentration.prototype.reset = function(){
     /* reset numtries */
     numtries = 0;
 }
+Concentration.prototype.getsavedscores = function(){
+    if(!Lib.hasLocalStorage() ){
+       throw new Error("Your browser doesn't support localStorage.");
+    } else if( localStorage.getItem('webinistaconcentration') !== null ){
+        return JSON.parse( localStorage['webinistaconcentration'] );
+    } else {
+        return [];
+    }
+}
+Concentration.prototype.savescores = function(scoresarray){
+    console.log( scoresarray );
+    localStorage['webinistaconcentration'] = JSON.stringify( scoresarray );
+}
 
 function init(){
     document.getElementById('config').addEventListener('submit', onconfsubmit, false);
@@ -305,9 +318,9 @@ var onsavescore = function(e){
     window.removeEventListener('savescore',onsavescore);
 
     if( Lib.hasLocalStorage() ){
-
-        localStorage[ localStorage.length ] = e.detail;
-        document.getElementById('gettop10').classList.remove('hide');
+        var currentscores = conc.getsavedscores();
+        currentscores[currentscores.length] = e.detail;
+        conc.savescores( currentscores );
     }
 
     /* Replay game */
@@ -408,9 +421,9 @@ var onstop = function(){
 }
 
 var replay = function(e){
-    var cde, config  = document.getElementById('config'),
+    var cde, config  = document.getElementById('config');
 
-    e.target.parentNode.parentNode.classList.add('hide');
+    e.target.parentNode.parentNode.classList.add('hide')
 
     /* Launch a new game */
     cde = document.createEvent('Event'),
@@ -424,3 +437,9 @@ window.addEventListener('DOMContentLoaded', init, false);
 window.addEventListener('unload', function(e){
     window.removeEventListener('DOMContentLoaded',init,false);
 }, false);
+
+window.addEventListener('storage', function(e){
+    console.log( '++++++++'+e.type+'++++++++');
+    console.log( e );
+}, false);
+
