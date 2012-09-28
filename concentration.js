@@ -330,23 +330,16 @@ var onsavescore = function(e){
 var onscoresubmit = function(e){
     e.preventDefault();
 
-    var numscores =  localStorage.length,
-        i,
-        list,
-        scores = [],
+    var scores = conc.getsavedscores(),
         top10,
-        top10scr,
-        score;
-
-    /* Move scores from an object to an array */
-    for(i=0; i < numscores; i++){
-        scores[i] = localStorage.getItem( localStorage.key(i) ) * 1;
-    }
+        list,
+        top10scr = document.getElementById('top10scores').getElementsByTagName('div')[0];
 
     /* Sort scores */
     top10 = scores.sort( function(a,b){ return b - a; }).splice(0,10);
     list = conc.buildtop10( top10 );
-    top10scr = document.getElementById('top10scores').getElementsByTagName('div')[0];
+    conc.savescores( top10 );
+
 
     /* Is this the first time we're inserting? If not, replace the current list. */
     if( Object.prototype.toString.call( top10scr.getElementsByTagName('h1')[0].nextElementSibling ) == "[object HTMLParagraphElement]" ){
@@ -363,13 +356,6 @@ var onscoresubmit = function(e){
         conc.clearscores();
     },false);
 
-    /* Clear old scores so we can rewrite the current top 10 */
-    localStorage.clear();
-
-    /* Write sorted list back to localStorage*/
-    for(i = 0; i < top10.length; i++){
-        localStorage[i] = top10[i];
-    }
 }
 
 var onshowscore = function(e){
