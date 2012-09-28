@@ -50,7 +50,7 @@ body{
     width: 121px;
     height: 121px;
     float:left;
-    margin:0 2.5rem 2.5rem 0;
+    margin:0 85px 85px 0;
     cursor:pointer;
     position:relative;
 
@@ -67,7 +67,7 @@ body{
         transform-style: preserve-3d;
 }
 
-.card, .front, .back{
+.front, .back{
     padding: 20px;
     background:#fff;
 }
@@ -93,8 +93,9 @@ body{
       border-radius:10px;
 }
 
-.front, .back img{background: #fff; display:block;}
+.front, .front img{background: #fff; display:block;}
 .back{background: #BCC1D1 url(images/cardback2.gif);}
+
 
 .card.flipped{
    -moz-transform: rotate3d(100,100,0,180deg);
