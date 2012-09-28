@@ -29,17 +29,36 @@ Note that images and fonts are subject to separate licenses.
 
 'use strict';
 
-/* Create an individual card */
-function Card(imgsrc, path){
+var conc,
+    conf = {
+        countdown:3,
+        pairs:6,
+        imgpath:'images/',
+        deck:'apple.png,bluestar.png,grapes.png,luckyseven.png,wine.png,bamboo2.png,heart.png,pineapple.png,yinyang.png,bananas.png,cat_paw_prints.png,knight.png,rabbit.png,baseball.png,checkmark.png,ladybug.png,diamond.png,beachball.png,chess.png,leaf.gif,treasure.png,bird.png,chips.png,lemon.gif,wasp.png'.split(',')
+    },
+    curpair = [],
+    start,
+    end,
+    transend = Lib.transitionend(),
+    numtries = 0;
+
+function Concentration(config){
+    this.deck  = config.deck;
+    this.pairs = config.pairs;
+    this.countdownfrom = config.countdown;
+    this.imgpath = config.imgpath;
+}
+
+Concentration.prototype.makecard = function(imgsrc){
     /* Creates:
-    <figure class="card">
-        <div class="front"></div>
-        <div class="back">&nbsp;</div>
-    </figure>
+    <div class="card" data-cardvalue="imgsrc">
+        <div class="front"><img src="imgsrc"></div>
+        <div class="back"></div>
+    </div>
     */
     var front, back, card, img = new Image();
 
-    img.src = path+imgsrc;
+    img.src = imgsrc;
 
     front = document.createElement('div');
     front.setAttribute('class','front');
@@ -48,7 +67,7 @@ function Card(imgsrc, path){
     back = front.cloneNode(false);
     back.setAttribute('class','back');
 
-    card = document.createElement('figure');
+    card = document.createElement('div');
     card.setAttribute('data-cardvalue',img.src);
     card.setAttribute('class','card');
     card.appendChild(front);
@@ -56,21 +75,7 @@ function Card(imgsrc, path){
 
     return card;
 }
-
-
-var conf = {
-        countdown:3,
-        pairs:6,
-        imgdir:'images/',
-        cards:'apple.png,bluestar.png,grapes.png,luckyseven.png,wine.png,bamboo2.png,heart.png,pineapple.png,yinyang.png,bananas.png,cat_paw_prints.png,knight.png,rabbit.png,baseball.png,checkmark.png,ladybug.png,diamond.png,beachball.png,chess.png,leaf.gif,treasure.png,bird.png,chips.png,lemon.gif,wasp.png'.split(',')
-    },
-    curpair = [],
-    start,
-    end,
-    transend = Lib.transitionend(),
-    numtries = 0;
-
-var buildtop10 = function(scoresarray){
+Concentration.prototype.buildtop10 = function(scoresarray){
     var ol, len = scoresarray.length, li, i, t, sca;
     ol = document.createElement('ol');
     for(i = 0; i < 10; i++){
@@ -83,18 +88,57 @@ var buildtop10 = function(scoresarray){
     }
     return ol;
 }
-
-var clearscores = function(){
+Concentration.prototype.clearscores = function(){
+    console.log(this);
      var empty10 = [],
      ts = document.getElementById('top10scores').getElementsByTagName('div')[0];
      empty10.length = 10;
      localStorage.clear();
 
      /* Replace the current list. */
-     ts.replaceChild( buildtop10( empty10 ), document.getElementsByTagName('ol')[0] );
+     ts.replaceChild( this.buildtop10( empty10 ), document.getElementsByTagName('ol')[0] );
 }
+Concentration.prototype.doesmatch = function(a,b){
+    var matches, matchevt;
 
-var countdown = function(e){
+    if( arguments.length == 2){
+        (a === b) ? matches = 'matches' : matches = 'resetcards';
+        matchevt = new CustomEvent( matches );
+        window.dispatchEvent( matchevt );
+    } else {
+        throw new RangeError('I need two arguments to compare.');
+    }
+}
+Concentration.prototype.isdone = function(){
+    /* Checks whether we have matched all pairs */
+    var matchedpairs = document.getElementsByClassName('matched').length / 2;
+
+    if(matchedpairs == conf.pairs){
+       window.dispatchEvent( new CustomEvent('stoptime') );
+    }
+}
+Concentration.prototype.deal = function(){
+    /* Shuffle the cards, pick a set,
+       copy the set and then shuffle it */
+    var c = this.deck.shuffle(),
+        deck1 = c.slice(0, this.pairs),
+        deck2 = deck1.copy().shuffle(),
+        cd, j,
+        deckwrapper = document.getElementById('deck');
+
+    for(j=0; j < deck1.length; j++){
+        deckwrapper.appendChild( conc.makecard(this.imgpath + deck1[j]) );
+        deckwrapper.appendChild( conc.makecard(this.imgpath + deck2[j]) );
+    }
+
+    /* Add an event handler for the start and stop time events */
+    window.addEventListener('starttime', onstart, false);
+    window.addEventListener('stoptime', onstop, false);
+
+    cd =  new CustomEvent('countdown');
+    window.dispatchEvent( cd );
+}
+Concentration.prototype.countdown = function(){
     var sec = conf.countdown,
         cd,
         s,
@@ -103,24 +147,12 @@ var countdown = function(e){
     cui.replaceChild( document.createTextNode(''), cui.firstChild);
     cui.classList.remove('hide');
 
-    document.body.addEventListener('click', onclick ,false);
-    document.body.addEventListener('savescore',onsavescore,false);
-
-    window.addEventListener('tallyscore', ontallyscore, false);
-    window.addEventListener('showscore', onshowscore, false);
-
-    /* When we match a pair */
-    window.addEventListener('matches', onmatch, false);
-
-    /* When we don't match a pair */
-    window.addEventListener('resetcards', onreset, false);
-
     cd = setInterval( function(){
         /* When the countdown is over...*/
         if( sec == 0 ){
             s = document.createTextNode('GO!');
         } else if( sec == -1){
-            window.dispatchEvent( new Event('starttime') );
+            window.dispatchEvent( new CustomEvent('starttime') );
             clearInterval(cd);
         } else {
             s = document.createTextNode(sec);
@@ -130,50 +162,39 @@ var countdown = function(e){
     }, 800);
 }
 
-var doesmatch = function(a,b){
-    var matches, matchevt;
-
-    if( arguments.length == 2){
-        (a === b) ? matches = 'matches' : matches = 'resetcards';
-        matchevt = new Event( matches );
-        window.dispatchEvent( matchevt );
-    } else {
-        throw new RangeError('I need two arguments to compare.');
-    }
+Concentration.prototype.start = function(){
+    return Date.now();
+}
+Concentration.prototype.stop = function(){
+    return Date.now();
 }
 
-var init = function(e){
-    /* Add an event listener to the configuration form. */
-    var config = document.getElementById('config');
-    config.addEventListener('submit', onconfsubmit, false);
-    window.addEventListener('countdown', countdown, false);
+function init(){
+    document.getElementById('config').addEventListener('submit', onconfsubmit, false);
+    window.addEventListener('countdown', oncountdown, false);
 }
 
-var isdone = function(){
-    /* Checks whether we have matched all pairs */
-    var matchedpairs = document.getElementsByClassName('matched').length / 2;
-
-    if(matchedpairs == conf.pairs){
-       window.dispatchEvent( new Event('stoptime') );
-    }
-}
 
 /* Using event delegation here. */
 var onclick = function(e){
     var cp = curpair,
         cur = e.target.parentNode,
-        curclasses = e.target.parentNode.classList;
+        curclasses = cur.classList,
+        onflip = function(e){
+            e.preventDefault();
+            var cp = curpair;
+            if( cp.length == 2){
+                conc.doesmatch( cp[0], cp[1]);
+            }
+            e.target.removeEventListener(transend,onflip,true);
+        };
 
     if( curclasses.contains('card') ){
-
-        // If we have flipped it over, don't let be flipped again.
+        /* Don't flip twice */
         if( curclasses.contains('flipped') === false ){
-
             curclasses.add('flipped');
             cp.push( cur.dataset.cardvalue );
-
             if( cp.length == 2 ){ numtries++; }
-
             cur.addEventListener(transend, onflip, true);
         }
     }
@@ -183,27 +204,54 @@ var onclick = function(e){
         document.getElementById('top10scores').classList.add('hide');
         document.getElementById('score').classList.remove('hide');
     }
+
+    console.log( e.target.classList );
+    console.log( e.currentTarget.classList );
 }
 
 var onconfsubmit = function(e){
     e.preventDefault();
     e.target.classList.add('hide');
-    shuff( conf.pairs );
+    conc = new Concentration(conf);
+    conc.deal( conf.cards, conf.pairs );
     document.getElementById('score').addEventListener('submit', onscoresubmit, false);
 }
 
-var onflip = function(e){
-    e.preventDefault();
-    var cp = curpair;
-    if( cp.length == 2){
-       doesmatch( cp[0], cp[1]);
+var oncountdown = function(e){
+    conc.countdown();
+    window.addEventListener('click', onclick, false);
+    window.addEventListener('savescore',onsavescore,false);
+    window.addEventListener('tallyscore', ontallyscore, false);
+    window.addEventListener('showscore', onshowscore, false);
+    window.addEventListener('matches', onmatch, false);
+    window.addEventListener('resetcards', onreset, false);
+}
+
+var ontallyscore = function(e){
+        var howlong, score, sendscore;
+        /*
+        calculate the score.
+        */
+        howlong   = e.end - e.start;
+        score     = (1000000 * conf.pairs / howlong / e.tries) * 100;
+        sendscore = new CustomEvent('showscore');
+
+    /* If it's an infinite number, there's probably an error. */
+    if( score === Number.POSITIVE_INFINITY ){
+        /* Will improve later. */
+        alert('Unable to calculate a score. This can happen if the game has run for too long.');
+    } else {
+        sendscore.score = Math.round( score );
+        sendscore.tries = e.tries;
+        sendscore.time  = howlong/1000;
+        sendscore.successrate = conf.pairs / e.tries;
+        window.dispatchEvent(sendscore);
     }
-    e.target.removeEventListener(transend,onflip,true);
 }
 
 var onmatch = function(e){
-    var these = document.getElementsByClassName('flipped'),
-        len = these.length,
+    var these      = document.getElementsByClassName('flipped'),
+        len        = these.length,
         onmatchend = function(t){
             t.target.classList.add('invisible');
             t.target.removeEventListener(transend,onmatchend,false);
@@ -215,10 +263,10 @@ var onmatch = function(e){
     }
 
     /* Reset the list of flipped items */
-    window.dispatchEvent( new Event('resetcards') );
+    window.dispatchEvent( new CustomEvent('resetcards') );
 
     /* Check whether we should end the game */
-    isdone();
+    conc.isdone();
 }
 
 var onreset = function(e){
@@ -234,7 +282,7 @@ var onreset = function(e){
 
 var onsavescore = function(e){
     /* Prevents this function from being called twice */
-    document.body.removeEventListener('savescore',onsavescore);
+    window.removeEventListener('savescore',onsavescore);
 
     if( Lib.hasLocalStorage() ){
         localStorage[ localStorage.length ] = e.score;
@@ -264,7 +312,7 @@ var onscoresubmit = function(e){
 
     /* Sort scores */
     top10 = scores.sort( function(a,b){ return b - a; }).splice(0,10); // should this be a slice instead?
-    list = buildtop10( top10 );
+    list = conc.buildtop10( top10 );
     top10scr = document.getElementById('top10scores').getElementsByTagName('div')[0];
 
     /* Is this the first time we're inserting? If not, replace the current list. */
@@ -278,7 +326,9 @@ var onscoresubmit = function(e){
     document.getElementById('score').classList.add('hide');
 
     /* Reset scores */
-    document.getElementById('resethighscores').addEventListener('click',clearscores,false);
+    document.getElementById('resethighscores').addEventListener('click',function(){
+        conc.clearscores();
+    },false);
 
     /* Clear old scores so we can rewrite the current top 10 */
     localStorage.clear();
@@ -291,11 +341,11 @@ var onscoresubmit = function(e){
 
 var onshowscore = function(e){
 
-    var tries = document.getElementById('tries').getElementsByTagName('b')[0],
-        time = document.getElementById('time').getElementsByTagName('b')[0],
-        rate = document.getElementById('percentage').getElementsByTagName('b')[0],
-        points = document.getElementById('points'),
-        savescore = new Event('savescore');
+    var tries     = document.getElementById('tries').getElementsByTagName('b')[0],
+        time      = document.getElementById('time').getElementsByTagName('b')[0],
+        rate      = document.getElementById('percentage').getElementsByTagName('b')[0],
+        points    = document.getElementById('points'),
+        savescore = new CustomEvent('savescore');
 
     if(e.score){
         var sc = Lib.formatinteger(e.score);
@@ -315,47 +365,24 @@ var onshowscore = function(e){
     document.getElementById('score').classList.remove('hide');
 
     savescore.score = e.score;
-    document.body.dispatchEvent(savescore);
+    window.dispatchEvent(savescore);
 }
 
 var onstart = function(){
     document.getElementById('overlay').classList.add('hide');
     document.getElementById('countdown').classList.add('hide');
     document.getElementById('deck').classList.remove('hide');
-    start = Date.now();
+    start = conc.start();
 }
 
 var onstop = function(){
     var scoreevt;
     document.getElementById('deck').classList.add('hide');
-    scoreevt       = new Event('tallyscore');
+    scoreevt       = new CustomEvent('tallyscore');
     scoreevt.start = start;
-    scoreevt.end   = Date.now();
+    scoreevt.end   = conc.stop();
     scoreevt.tries = numtries;
     setTimeout(function(){ window.dispatchEvent(scoreevt); },300);
-}
-
-var ontallyscore = function(e){
-    var howlong, score, sendscore;
-    /*
-    calculate the score.
-    */
-    howlong = e.end - e.start;
-    score   = (1000000 * conf.pairs / howlong / e.tries) * 100;
-
-    sendscore = new Event('showscore');
-
-    // If it's an infinite number, there's probably an error.
-    if( score === Number.POSITIVE_INFINITY ){
-        // Will improve later.
-        alert('Unable to calculate a score. This can happen if the game has run for too long.');
-    } else {
-        sendscore.score = Math.round( score );
-        sendscore.tries = e.tries;
-        sendscore.time  = howlong/1000;
-        sendscore.successrate = conf.pairs / e.tries;
-        window.dispatchEvent(sendscore);
-    }
 }
 
 var replay = function(e){
@@ -388,28 +415,6 @@ var replay = function(e){
     /* Launch a new game */
     cde.initEvent('submit',false,true);
     config.dispatchEvent(cde);
-}
-
-var shuff = function(numpairs){
-    /* Shuffle the cards, pick a set,
-       copy the set and then shuffle it */
-    var c = conf.cards.shuffle(),
-        deck1 = c.slice(0,numpairs),
-        deck2 = deck1.copy().shuffle(),
-        cd, j,
-        deckwrapper = document.getElementById('deck');
-
-    for(j=0; j < deck1.length; j++){
-        deckwrapper.appendChild( new Card(deck1[j],conf.imgdir) );
-        deckwrapper.appendChild( new Card(deck2[j],conf.imgdir) );
-    }
-
-    /* Add an event handler for the start and stop time events */
-    window.addEventListener('starttime', onstart, false);
-    window.addEventListener('stoptime', onstop, false);
-
-    cd =  new Event('countdown');
-    window.dispatchEvent( cd );
 }
 
 window.addEventListener('DOMContentLoaded', init, false);

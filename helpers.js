@@ -28,26 +28,31 @@ Note that images and fonts are subject to separate licenses.
 */
 
 /* Shuffle function from http://stackoverflow.com/questions/962802/is-it-correct-to-use-javascript-array-sort-method-for-shuffling */
-Array.prototype.shuffle = function() {
-    var tmp, current, top = this.length;
-    if(top) {
-        while(--top) {
-            current = Math.floor(Math.random() * (top + 1));
-            tmp = this[current];
-            this[current] = this[top];
-            this[top] = tmp;
-        }
-    }
-    return this;
-};
 
-Array.prototype.copy = function(){
-    var i, len = this.length, copy = [];
-    for(i = 0; i < len; i++){
-        copy[i] = this[i];
-    }
-    return copy;
-};
+if( typeof Array.prototype.shuffle == 'undefined'){
+    Array.prototype.shuffle = function() {
+        var tmp, current, top = this.length;
+        if(top) {
+            while(--top) {
+                current = Math.floor(Math.random() * (top + 1));
+                tmp = this[current];
+                this[current] = this[top];
+                this[top] = tmp;
+            }
+        }
+        return this;
+    };
+}
+
+if( typeof Array.prototype.copy == 'undefined'){
+    Array.prototype.copy = function(){
+        var i, len = this.length, copy = [];
+        for(i = 0; i < len; i++){
+            copy[i] = this[i];
+        }
+        return copy;
+    };
+}
 
 function Lib(){}
 
