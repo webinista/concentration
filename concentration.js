@@ -363,7 +363,7 @@ var onshowscore = function(e){
         time      = document.getElementById('time').getElementsByTagName('b')[0],
         rate      = document.getElementById('percentage').getElementsByTagName('b')[0],
         points    = document.getElementById('points'),
-        savescore,
+        savescore,succrate,sc,tm,succratetxt,
         scoreobj  = e.detail;
 
     if(scoreobj.score){
@@ -374,10 +374,15 @@ var onshowscore = function(e){
         tries.replaceChild( document.createTextNode(scoreobj.tries), tries.firstChild );
     }
     if(scoreobj.time){
-        time.replaceChild( document.createTextNode( Lib.hundreths(scoreobj.time)+' seconds'), time.firstChild );
+        tm = scoreobj.time+' seconds'
+        time.replaceChild( document.createTextNode(tm), time.firstChild );
     }
     if(scoreobj.successrate){
-        rate.replaceChild( document.createTextNode( Lib.hundreths( scoreobj.successrate*100)+'%' ), rate.firstChild );
+        succrate = scoreobj.successrate*100;
+        succrate = succrate+'%';
+        succratetxt = document.createTextNode(succrate);
+
+        rate.replaceChild( succratetxt, rate.firstChild );
     }
 
     document.getElementById('overlay').classList.remove('hide');
