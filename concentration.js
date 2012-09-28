@@ -89,7 +89,6 @@ Concentration.prototype.buildtop10 = function(scoresarray){
     return ol;
 }
 Concentration.prototype.clearscores = function(){
-    console.log(this);
      var empty10 = [],
      ts = document.getElementById('top10scores').getElementsByTagName('div')[0];
      empty10.length = 10;
@@ -161,12 +160,32 @@ Concentration.prototype.countdown = function(){
         sec--;
     }, 800);
 }
-
 Concentration.prototype.start = function(){
     return Date.now();
 }
 Concentration.prototype.stop = function(){
     return Date.now();
+}
+Concentration.prototype.reset = function(){
+    var i, len,
+        cd     = document.getElementById('countdown'),
+        score  = document.getElementById('score'),
+        scores = score.getElementsByTagName('b'),
+        deck   = document.getElementById('deck'),
+
+        cards = deck.getElementsByClassName('card');
+        len   = cards.length;
+
+    /* Remove all cards from stack */
+    while( deck.firstElementChild ){
+        deck.removeChild( deck.firstElementChild );
+    }
+    for(i = 0; i < scores.length; i++){
+        scores[i].replaceChild( document.createTextNode(''), scores[i].firstChild );
+    }
+
+    /* reset numtries */
+    numtries = 0;
 }
 
 function init(){
@@ -204,9 +223,6 @@ var onclick = function(e){
         document.getElementById('top10scores').classList.add('hide');
         document.getElementById('score').classList.remove('hide');
     }
-
-    console.log( e.target.classList );
-    console.log( e.currentTarget.classList );
 }
 
 var onconfsubmit = function(e){
@@ -228,23 +244,27 @@ var oncountdown = function(e){
 }
 
 var ontallyscore = function(e){
-        var howlong, score, sendscore;
+        var howlong, score, sendscore,
         /*
         calculate the score.
         */
-        howlong   = e.end - e.start;
-        score     = (1000000 * conf.pairs / howlong / e.tries) * 100;
-        sendscore = new CustomEvent('showscore');
+        howlong   = e.end - e.start,
+        score     = (1000000 * conf.pairs / howlong / e.tries) * 100,
+        data = {},
+        sendscore;
 
     /* If it's an infinite number, there's probably an error. */
     if( score === Number.POSITIVE_INFINITY ){
         /* Will improve later. */
         alert('Unable to calculate a score. This can happen if the game has run for too long.');
     } else {
-        sendscore.score = Math.round( score );
-        sendscore.tries = e.tries;
-        sendscore.time  = howlong/1000;
-        sendscore.successrate = conf.pairs / e.tries;
+        data.score = Math.round( score );
+        data.tries = e.tries;
+        data.time  = howlong/1000;
+        data.successrate = conf.pairs / e.tries;
+
+        sendscore = new CustomEvent('showscore',{detail:data});
+
         window.dispatchEvent(sendscore);
     }
 }
@@ -285,7 +305,8 @@ var onsavescore = function(e){
     window.removeEventListener('savescore',onsavescore);
 
     if( Lib.hasLocalStorage() ){
-        localStorage[ localStorage.length ] = e.score;
+
+        localStorage[ localStorage.length ] = e.detail;
         document.getElementById('gettop10').classList.remove('hide');
     }
 
@@ -311,7 +332,7 @@ var onscoresubmit = function(e){
     }
 
     /* Sort scores */
-    top10 = scores.sort( function(a,b){ return b - a; }).splice(0,10); // should this be a slice instead?
+    top10 = scores.sort( function(a,b){ return b - a; }).splice(0,10);
     list = conc.buildtop10( top10 );
     top10scr = document.getElementById('top10scores').getElementsByTagName('div')[0];
 
@@ -345,26 +366,27 @@ var onshowscore = function(e){
         time      = document.getElementById('time').getElementsByTagName('b')[0],
         rate      = document.getElementById('percentage').getElementsByTagName('b')[0],
         points    = document.getElementById('points'),
-        savescore = new CustomEvent('savescore');
+        savescore,
+        scoreobj  = e.detail;
 
-    if(e.score){
-        var sc = Lib.formatinteger(e.score);
+    if(scoreobj.score){
+        var sc = Lib.formatinteger(scoreobj.score);
         points.replaceChild( document.createTextNode(sc), points.firstChild );
     }
-    if(e.tries){
-        tries.replaceChild( document.createTextNode(e.tries), tries.firstChild );
+    if(scoreobj.tries){
+        tries.replaceChild( document.createTextNode(scoreobj.tries), tries.firstChild );
     }
-    if(e.time){
-        time.replaceChild( document.createTextNode( Lib.hundreths(e.time)+' seconds'), time.firstChild );
+    if(scoreobj.time){
+        time.replaceChild( document.createTextNode( Lib.hundreths(scoreobj.time)+' seconds'), time.firstChild );
     }
-    if(e.successrate){
-        rate.replaceChild( document.createTextNode( Lib.hundreths( e.successrate*100)+'%' ), rate.firstChild );
+    if(scoreobj.successrate){
+        rate.replaceChild( document.createTextNode( Lib.hundreths( scoreobj.successrate*100)+'%' ), rate.firstChild );
     }
 
     document.getElementById('overlay').classList.remove('hide');
     document.getElementById('score').classList.remove('hide');
 
-    savescore.score = e.score;
+    savescore = new CustomEvent('savescore',{detail:scoreobj.score});
     window.dispatchEvent(savescore);
 }
 
@@ -386,35 +408,16 @@ var onstop = function(){
 }
 
 var replay = function(e){
-    var cards,
-        i,
-        len,
-        cd     = document.getElementById('countdown'),
-        cde    = document.createEvent('Event'),
-        score  = document.getElementById('score'),
-        scores = score.getElementsByTagName('b'),
-        deck   = document.getElementById('deck'),
-        config = document.getElementById('config');
+    var cde, config  = document.getElementById('config'),
 
     e.target.parentNode.parentNode.classList.add('hide');
 
-    /* Remove all cards from stack */
-    cards = deck.getElementsByClassName('card');
-    len   = cards.length;
-
-    while( deck.firstElementChild ){
-        deck.removeChild( deck.firstElementChild );
-    }
-    for(i = 0; i < scores.length; i++){
-        scores[i].replaceChild( document.createTextNode(''), scores[i].firstChild );
-    }
-
-    /* reset numtries */
-    numtries = 0;
-
     /* Launch a new game */
+    cde = document.createEvent('Event'),
     cde.initEvent('submit',false,true);
     config.dispatchEvent(cde);
+
+    conc.reset();
 }
 
 window.addEventListener('DOMContentLoaded', init, false);

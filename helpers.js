@@ -128,4 +128,5 @@ Lib.prototype.hasClassList = function(){
     return document.body.classList !== undefined;
 }
 
+
 window.Lib = new Lib();
