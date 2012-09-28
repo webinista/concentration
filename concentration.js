@@ -160,6 +160,18 @@ Concentration.prototype.countdown = function(){
         sec--;
     }, 800);
 }
+Concentration.prototype.getsavedscores = function(){
+    if(!Lib.hasLocalStorage() ){
+       throw new Error("Your browser doesn't support localStorage.");
+    } else if( localStorage.getItem('webinistaconcentration') !== null ){
+        return JSON.parse( localStorage['webinistaconcentration'] );
+    } else {
+        return [];
+    }
+}
+Concentration.prototype.savescores = function(scoresarray){
+    localStorage['webinistaconcentration'] = JSON.stringify( scoresarray );
+}
 Concentration.prototype.start = function(){
     return Date.now();
 }
@@ -187,24 +199,11 @@ Concentration.prototype.reset = function(){
     /* reset numtries */
     numtries = 0;
 }
-Concentration.prototype.getsavedscores = function(){
-    if(!Lib.hasLocalStorage() ){
-       throw new Error("Your browser doesn't support localStorage.");
-    } else if( localStorage.getItem('webinistaconcentration') !== null ){
-        return JSON.parse( localStorage['webinistaconcentration'] );
-    } else {
-        return [];
-    }
-}
-Concentration.prototype.savescores = function(scoresarray){
-    localStorage['webinistaconcentration'] = JSON.stringify( scoresarray );
-}
 
 function init(){
     document.getElementById('config').addEventListener('submit', onconfsubmit, false);
     window.addEventListener('countdown', oncountdown, false);
 }
-
 
 /* Using event delegation here. */
 var onclick = function(e){
@@ -406,16 +405,15 @@ var onstop = function(){
 }
 
 var replay = function(e){
-    var cde, config  = document.getElementById('config');
 
+    var cde, config  = document.getElementById('config');
+    conc.reset();
     e.target.parentNode.parentNode.classList.add('hide')
 
     /* Launch a new game */
     cde = document.createEvent('Event'),
     cde.initEvent('submit',false,true);
     config.dispatchEvent(cde);
-
-    conc.reset();
 }
 
 window.addEventListener('DOMContentLoaded', init, false);
