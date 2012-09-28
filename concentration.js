@@ -197,7 +197,6 @@ Concentration.prototype.getsavedscores = function(){
     }
 }
 Concentration.prototype.savescores = function(scoresarray){
-    console.log( scoresarray );
     localStorage['webinistaconcentration'] = JSON.stringify( scoresarray );
 }
 
@@ -437,9 +436,3 @@ window.addEventListener('DOMContentLoaded', init, false);
 window.addEventListener('unload', function(e){
     window.removeEventListener('DOMContentLoaded',init,false);
 }, false);
-
-window.addEventListener('storage', function(e){
-    console.log( '++++++++'+e.type+'++++++++');
-    console.log( e );
-}, false);
-
