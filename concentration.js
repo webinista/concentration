@@ -380,7 +380,7 @@ var onshowscore = function(e){
     if(scoreobj.successrate){
         succrate = scoreobj.successrate*100;
         succrate = succrate+'%';
-        succratetxt = document.createTextNode(succrate);
+        succratetxt = document.createTextNode( Lib.hundredths( succrate) );
 
         rate.replaceChild( succratetxt, rate.firstChild );
     }

@@ -61,7 +61,7 @@ function Lib(){
 Lib.prototype.hasLocalStorage = function(){
     return ( window.localStorage !== undefined ) && ( Object.prototype.toString.call(window.localStorage) === "[object Storage]");
 }
-Lib.prototype.hundreths = function(number){
+Lib.prototype.hundredths = function(number){
     number += '';
     if( number.indexOf('.') > -1 ){
        var splitondecimal = number.split('.');
