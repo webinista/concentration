@@ -200,6 +200,14 @@ Concentration.prototype.reset = function(){
     numtries = 0;
 }
 
+Concentration.prototype.seconds = function(start,end){
+    return (end - start) / 1000;
+
+    console.log( end );
+    console.log( start );
+}
+
+/*----- Start the game ------*/
 function init(){
     document.getElementById('config').addEventListener('submit', onconfsubmit, false);
     window.addEventListener('countdown', oncountdown, false);
@@ -259,10 +267,10 @@ var ontallyscore = function(e){
         /*
         calculate the score.
         */
-        howlong   = e.end - e.start,
-        score     = (1000000 * conf.pairs / howlong / e.tries) * 100,
-        data = {},
-        sendscore;
+
+        howlong   = conc.seconds(e.start, e.end),
+        score     = (10000 * conf.pairs / howlong / e.tries),
+        data = {};
 
     /* If it's an infinite number, there's probably an error. */
     if( score === Number.POSITIVE_INFINITY ){
@@ -271,7 +279,7 @@ var ontallyscore = function(e){
     } else {
         data.score = Math.round( score );
         data.tries = e.tries;
-        data.time  = howlong/1000;
+        data.time  = howlong;
         data.successrate = conf.pairs / e.tries;
 
         sendscore = new CustomEvent('showscore',{detail:data});

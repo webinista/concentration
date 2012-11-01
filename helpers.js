@@ -54,9 +54,7 @@ if( typeof Array.prototype.copy == 'undefined'){
     };
 }
 
-function Lib(){
-
-}
+function Lib(){}
 
 Lib.prototype.hasLocalStorage = function(){
     return ( window.localStorage !== undefined ) && ( Object.prototype.toString.call(window.localStorage) === "[object Storage]");

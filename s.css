@@ -41,6 +41,7 @@ body{
      -o-perspective: 1000px;
 -webkit-perspective: 1000px;
         perspective: 1000px;
+-webkit-perspective-origin: 50% 50%;
     min-height: 100%;
     margin:1rem auto;
     width:825px;
