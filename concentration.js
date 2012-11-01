@@ -202,9 +202,13 @@ Concentration.prototype.reset = function(){
 
 Concentration.prototype.seconds = function(start,end){
     return (end - start) / 1000;
+}
 
-    console.log( end );
-    console.log( start );
+Concentration.prototype.tally = function(time,pairs,tries){
+    var results = {};
+    results.score = (1000000 * pairs / time / tries);
+    results.successrate = pairs / tries;
+    return results;
 }
 
 /*----- Start the game ------*/
@@ -263,13 +267,12 @@ var oncountdown = function(e){
 }
 
 var ontallyscore = function(e){
-        var howlong, score, sendscore,
+        var howlong, tally, sendscore,
         /*
         calculate the score.
         */
-
         howlong   = conc.seconds(e.start, e.end),
-        score     = (10000 * conf.pairs / howlong / e.tries),
+        tally     = conc.tally(howlong,conf.pairs,e.tries),
         data = {};
 
     /* If it's an infinite number, there's probably an error. */
@@ -277,10 +280,10 @@ var ontallyscore = function(e){
         /* Will improve later. */
         alert('Unable to calculate a score. This can happen if the game has run for too long.');
     } else {
-        data.score = Math.round( score );
+        data.score = Math.round( tally.score );
         data.tries = e.tries;
         data.time  = howlong;
-        data.successrate = conf.pairs / e.tries;
+        data.successrate = tally.successrate;
 
         sendscore = new CustomEvent('showscore',{detail:data});
 
