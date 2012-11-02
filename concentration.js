@@ -32,7 +32,7 @@ Note that images and fonts are subject to separate licenses.
 var conc,
     conf = {
         countdown:3,
-        pairs:6,
+        pairs:4,
         imgpath:'images/',
         deck:'apple.png,bluestar.png,grapes.png,luckyseven.png,wine.png,bamboo2.png,heart.png,pineapple.png,yinyang.png,bananas.png,cat_paw_prints.png,knight.png,rabbit.png,baseball.png,checkmark.png,ladybug.png,diamond.png,beachball.png,chess.png,leaf.gif,treasure.png,bird.png,chips.png,lemon.gif,wasp.png'.split(',')
     },
@@ -40,7 +40,8 @@ var conc,
     start,
     end,
     transend = Lib.transitionend(),
-    numtries = 0;
+    numtries = 0,
+    has3d = Lib.has3d();
 
 function Concentration(config){
     this.deck  = config.deck;
@@ -199,8 +200,31 @@ Concentration.prototype.reset = function(){
     /* reset numtries */
     numtries = 0;
 }
+Concentration.prototype.seconds = function(start,end){
+    return (end - start) / 1000;
+}
+Concentration.prototype.tally = function(time,pairs,tries){
+    var results = {};
+    results.score = (pairs / time / tries) * 1000000;
+    results.successrate = (pairs / tries) * 100;
+    return results;
+}
 
+/*----- Start the game ------*/
 function init(){
+    /*
+    If this browser lacks 3D transforms support,
+    add the 2D stylesheet.
+    */
+
+    if( has3d === false ){
+        var css = document.createElement('link');
+        css.setAttribute('rel','stylesheet');
+        css.setAttribute('href','no3d.css');
+        css.setAttribute('media','screen');
+        document.head.appendChild(css);
+    }
+
     document.getElementById('config').addEventListener('submit', onconfsubmit, false);
     window.addEventListener('countdown', oncountdown, false);
 }
@@ -217,6 +241,10 @@ var onclick = function(e){
                 conc.doesmatch( cp[0], cp[1]);
             }
             e.target.removeEventListener(transend,onflip,true);
+
+            if( e.propertyName == 'opacity' ){
+                console.log( 'hi' );
+            }
         };
 
     if( curclasses.contains('card') ){
@@ -225,9 +253,11 @@ var onclick = function(e){
             curclasses.add('flipped');
             cp.push( cur.dataset.cardvalue );
             if( cp.length == 2 ){ numtries++; }
-            cur.addEventListener(transend, onflip, true);
+            cur.addEventListener(transend, onflip, false);
         }
     }
+
+    console.log( cur );
 
     /* For view scores button. */
     if( e.target.classList.contains('close') ){
@@ -255,26 +285,24 @@ var oncountdown = function(e){
 }
 
 var ontallyscore = function(e){
-        var howlong, score, sendscore,
+        var howlong, tally, sendscore,
         /*
         calculate the score.
         */
-        howlong   = e.end - e.start,
-        score     = (1000000 * conf.pairs / howlong / e.tries) * 100,
-        data = {},
-        sendscore;
+        howlong   = conc.seconds(e.start, e.end),
+        tally     = conc.tally(howlong,conf.pairs,e.tries),
+        data      = {};
 
     /* If it's an infinite number, there's probably an error. */
     if( score === Number.POSITIVE_INFINITY ){
-        /* Will improve later. */
-        alert('Unable to calculate a score. This can happen if the game has run for too long.');
+        throw new RangeError('Unable to calculate a score. This can happen if the game has run for too long.');
     } else {
-        data.score = Math.round( score );
+        data.score = Math.round( tally.score );
         data.tries = e.tries;
-        data.time  = howlong/1000;
-        data.successrate = conf.pairs / e.tries;
+        data.time  = howlong;
+        data.successrate = tally.successrate;
 
-        sendscore = new CustomEvent('showscore',{detail:data});
+        sendscore  = new CustomEvent('showscore',{detail:data});
 
         window.dispatchEvent(sendscore);
     }
@@ -336,7 +364,7 @@ var onscoresubmit = function(e){
 
     /* Sort scores */
     top10 = scores.sort( function(a,b){ return b - a; }).splice(0,10);
-    list = conc.buildtop10( top10 );
+    list  = conc.buildtop10( top10 );
     conc.savescores( top10 );
 
 
@@ -377,10 +405,11 @@ var onshowscore = function(e){
         tm = scoreobj.time+' seconds'
         time.replaceChild( document.createTextNode(tm), time.firstChild );
     }
+
     if(scoreobj.successrate){
-        succrate = scoreobj.successrate*100;
+        succrate = scoreobj.successrate;
         succrate = succrate+'%';
-        succratetxt = document.createTextNode( Lib.hundredths( succrate) );
+        succratetxt = document.createTextNode( Lib.hundredths( succrate ) );
 
         rate.replaceChild( succratetxt, rate.firstChild );
     }
