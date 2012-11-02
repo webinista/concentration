@@ -209,6 +209,7 @@ Concentration.prototype.tally = function(time,pairs,tries){
     results.successrate = (pairs / tries) * 100;
     return results;
 }
+
 /*----- Start the game ------*/
 function init(){
     /*
@@ -240,6 +241,10 @@ var onclick = function(e){
                 conc.doesmatch( cp[0], cp[1]);
             }
             e.target.removeEventListener(transend,onflip,true);
+
+            if( e.propertyName == 'opacity' ){
+                console.log( 'hi' );
+            }
         };
 
     if( curclasses.contains('card') ){
@@ -251,6 +256,8 @@ var onclick = function(e){
             cur.addEventListener(transend, onflip, false);
         }
     }
+
+    console.log( cur );
 
     /* For view scores button. */
     if( e.target.classList.contains('close') ){
