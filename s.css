@@ -166,7 +166,7 @@ select{
     vertical-align:middle
 }
 
-.close,button{
+.close, button.btn{
     font-family: 'SansitaOneRegular';
 }
 
@@ -197,9 +197,9 @@ select{
     background-image: linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
 }
 
-.close:active, button:active{box-shadow:none;}
+.close:active, button.btn:active{box-shadow:none;}
 
-button{
+button.btn{
     border:3px solid #537f94;
     font-size: 2em;
     line-height:1;
@@ -217,7 +217,7 @@ button{
     background-image: linear-gradient(top, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
 }
 
-button:hover{
+button.btn:hover{
     background-color: #1e4266;
     background-image: -webkit-linear-gradient(top, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
     background-image: -moz-linear-gradient(top, hsl(210, 55%, 26%), hsl(199, 28%, 45%));

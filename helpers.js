@@ -41,17 +41,18 @@ if( typeof Array.prototype.shuffle == 'undefined'){
             }
         }
         return this;
-    };
+    }
 }
 
 if( typeof Array.prototype.copy == 'undefined'){
     Array.prototype.copy = function(){
-        var i, len = this.length, copy = [];
-        for(i = 0; i < len; i++){
+        var i = 0, len = this.length, copy = [];
+        while(i < len){
             copy[i] = this[i];
+            ++i;
         }
         return copy;
-    };
+    }
 }
 
 function Lib(){}
@@ -127,6 +128,33 @@ Lib.prototype.has3d = function(){
 
 Lib.prototype.hasClassList = function(){
     return document.body.classList !== undefined;
+}
+
+Lib.prototype.has3d = function(){
+    var el = document.createElement('p'), t, has3d,
+    transforms = {
+        'WebkitTransform':'-webkit-transform',
+        'OTransform':'-o-transform',
+        'MSTransform':'-ms-transform',
+        'MozTransform':'-moz-transform',
+        'Transform':'transform'
+    };
+
+    /* Add it to the body to get the computed style.*/
+    document.body.insertBefore(el, document.body.lastChild);
+
+    for(t in transforms){
+        if( el.style[t] !== undefined ){
+            el.style[t] = 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)';
+            has3d = window.getComputedStyle(el).getPropertyValue( transforms[t] );
+        }
+    }
+
+    if( has3d !== undefined ){
+        return has3d !== 'none';
+    } else {
+        return false;
+    }
 }
 
 window.Lib = new Lib();
