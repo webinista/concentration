@@ -77,7 +77,7 @@ Concentration.prototype.makecard = function(imgsrc){
     return card;
 }
 Concentration.prototype.buildtop10 = function(scoresarray){
-    var ol, len = scoresarray.length, li, i, t, sca;
+    var ol, len = scoresarray.length, li, i, t, sca,
     ol = document.createElement('ol'),
     df = document.createDocumentFragment();
 
@@ -127,14 +127,14 @@ Concentration.prototype.deal = function(){
        copy the set and then shuffle it */
     var c = this.deck.shuffle(),
         deck1 = c.slice(0, this.pairs),
-        deck2 = deck1.copy().shuffle(), // creates matching set
+        deck2 = deck1.copy(), // creates matching set
         deckwrapper = document.getElementById('deck'),
         docfrag = document.createDocumentFragment(),
         path = this.imgpath,
         deck, cd, j;
 
-    // Merge deck1 and deck 2
-    deck = deck1.concat(deck2);
+    // Merge deck1 and deck 2, then shuffle
+    deck = deck1.concat(deck2).shuffle();
 
     // Create append to a document fragment...
     deck.map( function(o){
@@ -207,8 +207,8 @@ Concentration.prototype.reset = function(){
         deck.removeChild( deck.firstElementChild );
     }
 
-    scores.map( function(s){
-        s.replaceChild( document.createTextNode(''), scores[i].firstChild );
+    Array.prototype.map.call( scores, function(s){
+        s.replaceChild( document.createTextNode(''), s.firstChild );
     });
 
 
