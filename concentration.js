@@ -78,15 +78,20 @@ Concentration.prototype.makecard = function(imgsrc){
 }
 Concentration.prototype.buildtop10 = function(scoresarray){
     var ol, len = scoresarray.length, li, i, t, sca;
-    ol = document.createElement('ol');
-    for(i = 0; i < 10; i++){
-        isNaN( scoresarray[i] * 1 ) ? sca = '00000' : sca = Lib.formatinteger( scoresarray[i] );
-        t = document.createTextNode( sca );
-        li = document.createElement('li');
+    ol = document.createElement('ol'),
+    df = document.createDocumentFragment();
+
+    scoresarray.map( function(s){
+        isNaN( s * 1 ) ? sca = '00000' : sca = Lib.formatinteger( s );
+        t.textContent = sca;
+        li = document.createElement('li')
         li.appendChild( t );
-        ol.id = 'topscores';
-        ol.appendChild( li );
-    }
+        df.appendChild(li);
+    });
+
+    ol.id = 'topscores';
+    ol.appendChild( df );
+
     return ol;
 }
 Concentration.prototype.clearscores = function(){
@@ -201,9 +206,11 @@ Concentration.prototype.reset = function(){
     while( deck.firstElementChild ){
         deck.removeChild( deck.firstElementChild );
     }
-    for(i = 0; i < scores.length; i++){
-        scores[i].replaceChild( document.createTextNode(''), scores[i].firstChild );
-    }
+
+    scores.map( function(s){
+        s.replaceChild( document.createTextNode(''), scores[i].firstChild );
+    });
+
 
     /* reset numtries */
     numtries = 0;
@@ -321,10 +328,10 @@ var onmatch = function(e){
             t.target.removeEventListener(transend,onmatchend,false);
         }
 
-    for(var i=0; i < len; i++){
-        these[i].classList.add('matched');
-        these[i].addEventListener(transend,onmatchend,false);
-    }
+    Array.prototype.map.call(these, function(o){
+        o.classList.add('matched');
+        o.addEventListener(transend,onmatchend,false);
+    });
 
     /* Reset the list of flipped items */
     window.dispatchEvent( new CustomEvent('resetcards') );
@@ -335,11 +342,13 @@ var onmatch = function(e){
 
 var onreset = function(e){
     var these = document.getElementsByClassName('card');
-    for(var i=0; i < these.length; i++){
-        if( these[i].classList.contains('flipped') ){
-            these[i].classList.remove('flipped');
+
+    Array.prototype.map.call(these, function(o){
+        if( o.classList.contains('flipped') ){
+            o.classList.remove('flipped');
         }
-    }
+     });
+
     /* reset the current pair. */
     curpair.length = 0;
 }
