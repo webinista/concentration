@@ -32,7 +32,7 @@ Note that images and fonts are subject to separate licenses.
 var conc,
     conf = {
         countdown:3,
-        pairs:2,
+        pairs:6,
         imgpath:'images/',
         deck:'apple.png,bluestar.png,grapes.png,luckyseven.png,wine.png,bamboo2.png,heart.png,pineapple.png,yinyang.png,bananas.png,cat_paw_prints.png,knight.png,rabbit.png,baseball.png,checkmark.png,ladybug.png,diamond.png,beachball.png,chess.png,leaf.gif,treasure.png,bird.png,chips.png,lemon.gif,wasp.png'.split(',')
     },
@@ -374,8 +374,6 @@ var onscoresubmit = function(e){
 
     /* Sort scores */
     top10 = scores.sort( function(a,b){ return b - a; }).splice(0,10);
-
-    console.log('top10' + top10 );
 
     list  = conc.buildtop10( top10 );
     conc.savescores( top10 );
