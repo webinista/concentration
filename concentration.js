@@ -125,7 +125,6 @@ Concentration.prototype.deal = function(){
         deck2 = deck1.copy().shuffle(),
         cd, j,
         deckwrapper = document.getElementById('deck');
-
     for(j=0; j < deck1.length; j++){
         deckwrapper.appendChild( conc.makecard(this.imgpath + deck1[j]) );
         deckwrapper.appendChild( conc.makecard(this.imgpath + deck2[j]) );
@@ -180,14 +179,13 @@ Concentration.prototype.stop = function(){
     return Date.now();
 }
 Concentration.prototype.reset = function(){
-    var i, len,
+    var i,
         cd     = document.getElementById('countdown'),
         score  = document.getElementById('score'),
         scores = score.getElementsByTagName('b'),
         deck   = document.getElementById('deck'),
-
-        cards = deck.getElementsByClassName('card');
-        len   = cards.length;
+        cards  = deck.getElementsByClassName('card'),
+        len    = cards.length;
 
     /* Remove all cards from stack */
     while( deck.firstElementChild ){
@@ -256,9 +254,6 @@ var onclick = function(e){
             cur.addEventListener(transend, onflip, false);
         }
     }
-
-    console.log( cur );
-
     /* For view scores button. */
     if( e.target.classList.contains('close') ){
         document.getElementById('top10scores').classList.add('hide');
@@ -391,8 +386,8 @@ var onshowscore = function(e){
         time      = document.getElementById('time').getElementsByTagName('b')[0],
         rate      = document.getElementById('percentage').getElementsByTagName('b')[0],
         points    = document.getElementById('points'),
-        savescore,succrate,sc,tm,succratetxt,
-        scoreobj  = e.detail;
+        scoreobj  = e.detail,
+        savescore, succrate, sc,tm, succratetxt;
 
     if(scoreobj.score){
         var sc = Lib.formatinteger(scoreobj.score);
@@ -402,7 +397,7 @@ var onshowscore = function(e){
         tries.replaceChild( document.createTextNode(scoreobj.tries), tries.firstChild );
     }
     if(scoreobj.time){
-        tm = scoreobj.time+' seconds'
+        tm = scoreobj.time+' seconds';
         time.replaceChild( document.createTextNode(tm), time.firstChild );
     }
 
@@ -439,13 +434,12 @@ var onstop = function(){
 }
 
 var replay = function(e){
-
     var cde, config  = document.getElementById('config');
     conc.reset();
-    e.target.parentNode.parentNode.classList.add('hide')
+    e.target.parentNode.parentNode.classList.add('hide');
 
     /* Launch a new game */
-    cde = document.createEvent('Event'),
+    cde = document.createEvent('Event');
     cde.initEvent('submit',false,true);
     config.dispatchEvent(cde);
 }
