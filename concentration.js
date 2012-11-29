@@ -122,14 +122,23 @@ Concentration.prototype.deal = function(){
        copy the set and then shuffle it */
     var c = this.deck.shuffle(),
         deck1 = c.slice(0, this.pairs),
-        deck2 = deck1.copy().shuffle(),
-        cd, j,
-        deckwrapper = document.getElementById('deck');
+        deck2 = deck1.copy().shuffle(), // creates matching set
+        deckwrapper = document.getElementById('deck'),
+        docfrag = document.createDocumentFragment(),
+        path = this.imgpath,
+        deck, cd, j;
 
-    for(j=0; j < deck1.length; j++){
-        deckwrapper.appendChild( conc.makecard(this.imgpath + deck1[j]) );
-        deckwrapper.appendChild( conc.makecard(this.imgpath + deck2[j]) );
-    }
+    // Merge deck1 and deck 2
+    deck = deck1.concat(deck2);
+
+    // Create append to a document fragment...
+    deck.map( function(o){
+        var card = conc.makecard( path + o );
+        docfrag.appendChild( card );
+    });
+
+    // ... and update the DOM once
+    deckwrapper.appendChild( docfrag );
 
     /* Add an event handler for the start and stop time events */
     window.addEventListener('starttime', onstart, false);
@@ -180,14 +189,13 @@ Concentration.prototype.stop = function(){
     return Date.now();
 }
 Concentration.prototype.reset = function(){
-    var i, len,
+    var i,
         cd     = document.getElementById('countdown'),
         score  = document.getElementById('score'),
         scores = score.getElementsByTagName('b'),
         deck   = document.getElementById('deck'),
-
-        cards = deck.getElementsByClassName('card');
-        len   = cards.length;
+        cards  = deck.getElementsByClassName('card'),
+        len    = cards.length;
 
     /* Remove all cards from stack */
     while( deck.firstElementChild ){
@@ -256,9 +264,6 @@ var onclick = function(e){
             cur.addEventListener(transend, onflip, false);
         }
     }
-
-    console.log( cur );
-
     /* For view scores button. */
     if( e.target.classList.contains('close') ){
         document.getElementById('top10scores').classList.add('hide');
@@ -391,8 +396,8 @@ var onshowscore = function(e){
         time      = document.getElementById('time').getElementsByTagName('b')[0],
         rate      = document.getElementById('percentage').getElementsByTagName('b')[0],
         points    = document.getElementById('points'),
-        savescore,succrate,sc,tm,succratetxt,
-        scoreobj  = e.detail;
+        scoreobj  = e.detail,
+        savescore, succrate, sc,tm, succratetxt;
 
     if(scoreobj.score){
         var sc = Lib.formatinteger(scoreobj.score);
@@ -402,7 +407,7 @@ var onshowscore = function(e){
         tries.replaceChild( document.createTextNode(scoreobj.tries), tries.firstChild );
     }
     if(scoreobj.time){
-        tm = scoreobj.time+' seconds'
+        tm = scoreobj.time+' seconds';
         time.replaceChild( document.createTextNode(tm), time.firstChild );
     }
 
@@ -439,13 +444,12 @@ var onstop = function(){
 }
 
 var replay = function(e){
-
     var cde, config  = document.getElementById('config');
     conc.reset();
-    e.target.parentNode.parentNode.classList.add('hide')
+    e.target.parentNode.parentNode.classList.add('hide');
 
     /* Launch a new game */
-    cde = document.createEvent('Event'),
+    cde = document.createEvent('Event');
     cde.initEvent('submit',false,true);
     config.dispatchEvent(cde);
 }
