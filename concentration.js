@@ -122,13 +122,23 @@ Concentration.prototype.deal = function(){
        copy the set and then shuffle it */
     var c = this.deck.shuffle(),
         deck1 = c.slice(0, this.pairs),
-        deck2 = deck1.copy().shuffle(),
-        cd, j,
-        deckwrapper = document.getElementById('deck');
-    for(j=0; j < deck1.length; j++){
-        deckwrapper.appendChild( conc.makecard(this.imgpath + deck1[j]) );
-        deckwrapper.appendChild( conc.makecard(this.imgpath + deck2[j]) );
-    }
+        deck2 = deck1.copy().shuffle(), // creates matching set
+        deckwrapper = document.getElementById('deck'),
+        docfrag = document.createDocumentFragment(),
+        path = this.imgpath,
+        deck, cd, j;
+
+    // Merge deck1 and deck 2
+    deck = deck1.concat(deck2);
+
+    // Create append to a document fragment...
+    deck.map( function(o){
+        var card = conc.makecard( path + o );
+        docfrag.appendChild( card );
+    });
+
+    // ... and update the DOM once
+    deckwrapper.appendChild( docfrag );
 
     /* Add an event handler for the start and stop time events */
     window.addEventListener('starttime', onstart, false);
