@@ -32,7 +32,7 @@ Note that images and fonts are subject to separate licenses.
 var conc,
     conf = {
         countdown:3,
-        pairs:6,
+        pairs:2,
         imgpath:'images/',
         deck:'apple.png,bluestar.png,grapes.png,luckyseven.png,wine.png,bamboo2.png,heart.png,pineapple.png,yinyang.png,bananas.png,cat_paw_prints.png,knight.png,rabbit.png,baseball.png,checkmark.png,ladybug.png,diamond.png,beachball.png,chess.png,leaf.gif,treasure.png,bird.png,chips.png,lemon.gif,wasp.png'.split(',')
     },
@@ -77,15 +77,15 @@ Concentration.prototype.makecard = function(imgsrc){
     return card;
 }
 Concentration.prototype.buildtop10 = function(scoresarray){
-    var ol, len = scoresarray.length, li, i, t, sca,
-    ol = document.createElement('ol'),
-    df = document.createDocumentFragment();
+    var ol = document.createElement('ol'),
+        df = document.createDocumentFragment();
 
     scoresarray.map( function(s){
-        isNaN( s * 1 ) ? sca = '00000' : sca = Lib.formatinteger( s );
-        t.textContent = sca;
+        var sca, li;
+        // if this is a null or otherwise falsy value
+        !s ? sca = '00000' : sca = s;
         li = document.createElement('li')
-        li.appendChild( t );
+        li.textContent = Lib.formatinteger( sca );
         df.appendChild(li);
     });
 
@@ -97,12 +97,13 @@ Concentration.prototype.buildtop10 = function(scoresarray){
 Concentration.prototype.clearscores = function(){
      var empty10 = [],
      ts = document.getElementById('top10scores').getElementsByTagName('div')[0];
-     empty10.length = 10;
+
      localStorage.clear();
 
      /* Replace the current list. */
      ts.replaceChild( this.buildtop10( empty10 ), document.getElementsByTagName('ol')[0] );
 }
+
 Concentration.prototype.doesmatch = function(a,b){
     var matches, matchevt;
 
@@ -252,14 +253,11 @@ var onclick = function(e){
         onflip = function(e){
             e.preventDefault();
             var cp = curpair;
+
             if( cp.length == 2){
                 conc.doesmatch( cp[0], cp[1]);
             }
             e.target.removeEventListener(transend,onflip,true);
-
-            if( e.propertyName == 'opacity' ){
-                console.log( 'hi' );
-            }
         };
 
     if( curclasses.contains('card') ){
@@ -297,12 +295,12 @@ var oncountdown = function(e){
 }
 
 var ontallyscore = function(e){
-        var howlong, tally, sendscore,
+        var sendscore, p = conf.pairs,
         /*
         calculate the score.
         */
-        howlong   = conc.seconds(e.start, e.end),
-        tally     = conc.tally(howlong,conf.pairs,e.tries),
+        howlong   = conc.seconds(e.detail.start, e.detail.end),
+        tally     = conc.tally(howlong, p, e.detail.tries),
         data      = {};
 
     /* If it's an infinite number, there's probably an error. */
@@ -310,12 +308,10 @@ var ontallyscore = function(e){
         throw new RangeError('Unable to calculate a score. This can happen if the game has run for too long.');
     } else {
         data.score = Math.round( tally.score );
-        data.tries = e.tries;
+        data.tries = e.detail.tries;
         data.time  = howlong;
         data.successrate = tally.successrate;
-
-        sendscore  = new CustomEvent('showscore',{detail:data});
-
+        sendscore  = new CustomEvent('showscore',{detail:data });
         window.dispatchEvent(sendscore);
     }
 }
@@ -347,7 +343,7 @@ var onreset = function(e){
         if( o.classList.contains('flipped') ){
             o.classList.remove('flipped');
         }
-     });
+    });
 
     /* reset the current pair. */
     curpair.length = 0;
@@ -372,15 +368,17 @@ var onscoresubmit = function(e){
     e.preventDefault();
 
     var scores = conc.getsavedscores(),
-        top10,
+        top10 = [],
         list,
         top10scr = document.getElementById('top10scores').getElementsByTagName('div')[0];
 
     /* Sort scores */
     top10 = scores.sort( function(a,b){ return b - a; }).splice(0,10);
+
+    console.log('top10' + top10 );
+
     list  = conc.buildtop10( top10 );
     conc.savescores( top10 );
-
 
     /* Is this the first time we're inserting? If not, replace the current list. */
     if( Object.prototype.toString.call( top10scr.getElementsByTagName('h1')[0].nextElementSibling ) == "[object HTMLParagraphElement]" ){
@@ -396,7 +394,6 @@ var onscoresubmit = function(e){
     document.getElementById('resethighscores').addEventListener('click',function(){
         conc.clearscores();
     },false);
-
 }
 
 var onshowscore = function(e){
@@ -424,7 +421,6 @@ var onshowscore = function(e){
         succrate = scoreobj.successrate;
         succrate = succrate+'%';
         succratetxt = document.createTextNode( Lib.hundredths( succrate ) );
-
         rate.replaceChild( succratetxt, rate.firstChild );
     }
 
@@ -443,13 +439,17 @@ var onstart = function(){
 }
 
 var onstop = function(){
-    var scoreevt;
+    var scoreevt, data = {};
+
     document.getElementById('deck').classList.add('hide');
-    scoreevt       = new CustomEvent('tallyscore');
-    scoreevt.start = start;
-    scoreevt.end   = conc.stop();
-    scoreevt.tries = numtries;
-    setTimeout(function(){ window.dispatchEvent(scoreevt); },300);
+
+    data.start = start;
+    data.end   = conc.stop();
+    data.tries = numtries;
+
+    scoreevt   = new CustomEvent('tallyscore',{detail: data});
+
+    window.dispatchEvent(scoreevt);
 }
 
 var replay = function(e){
