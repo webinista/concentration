@@ -156,5 +156,11 @@ Lib.prototype.has3d = function(){
         return false;
     }
 }
+Lib.prototype.isTouch = function(){
+	if('ontouchstart' in window){
+		return true;
+	}
+	return false;
+}
 
 window.Lib = new Lib();

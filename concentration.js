@@ -254,6 +254,8 @@ Concentration.prototype.tally = function(time,pairs,tries){
 }
 
 /*----- Start the game ------*/
+var tap = Lib.isTouch() ? tap = 'touchstart' : tap = 'click';
+
 function init(){
     /*
     If this browser lacks 3D transforms support,
@@ -313,7 +315,7 @@ var onconfsubmit = function(e){
 
 var oncountdown = function(e){
     conc.countdown();
-    window.addEventListener('click', onclick, false);
+    window.addEventListener(tap, onclick, false);
     window.addEventListener('savescore',onsavescore,false);
     window.addEventListener('tallyscore', ontallyscore, false);
     window.addEventListener('showscore', onshowscore, false);
@@ -387,7 +389,7 @@ var onsavescore = function(e){
     }
 
     /* Replay game */
-    document.getElementById('replay').addEventListener('click',replay,false);
+    document.getElementById('replay').addEventListener(tap,replay,false);
 }
 
 /* Show the Top 10 */
@@ -420,7 +422,7 @@ var onscoresubmit = function(e){
     document.getElementById('score').classList.add('hide');
 
     /* Reset scores */
-    document.getElementById('resethighscores').addEventListener('click',function(){
+    document.getElementById('resethighscores').addEventListener(tap,function(){
        conc.resetscores();
     },false);
 }
