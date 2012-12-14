@@ -254,7 +254,7 @@ Concentration.prototype.tally = function(time,pairs,tries){
 }
 
 /*----- Start the game ------*/
-var tap = Lib.isTouch() ? tap = 'touchstart' : tap = 'click';
+var tap = Lib.isTouch() ? tap = 'touchend' : tap = 'click';
 
 function init(){
     /*
@@ -280,24 +280,24 @@ var onclick = function(e){
        cur = e.target.parentNode,
        curclasses = cur.classList,
        onflip = function(e){
-          e.preventDefault();
-          var cp = curpair;
-
+          e.preventDefault();  
           if( cp.length == 2){
-             conc.doesmatch( cp[0], cp[1]);
+             conc.doesmatch( cp[0], cp[1] );
+             numtries++;
           }
-          e.target.removeEventListener(transend,onflip,true);
+          e.target.removeEventListener(transend,onflip,false);
        };
 
-    if( curclasses.contains('card') ){
-       /* Don't flip twice */
-       if( curclasses.contains('flipped') === false ){
-          curclasses.add('flipped');
-          cp.push( cur.dataset.cardvalue );
-          if( cp.length == 2 ){ numtries++; }
-          cur.addEventListener(transend, onflip, false);
-       }
-    }
+	if( cp.length <= 2){
+    	if( curclasses.contains('card') && curclasses.contains('flipped') === false){ 
+           curclasses.add('flipped');  
+           if( cp.length < 2){
+          	cp.push( cur.dataset.cardvalue );
+          	cur.addEventListener(transend, onflip, false);
+          }
+    	}
+   }
+   
     /* For view scores button. */
     if( e.target.classList.contains('close') ){
        document.getElementById('top10scores').classList.add('hide');
@@ -315,6 +315,7 @@ var onconfsubmit = function(e){
 
 var oncountdown = function(e){
     conc.countdown();
+    
     window.addEventListener(tap, onclick, false);
     window.addEventListener('savescore',onsavescore,false);
     window.addEventListener('tallyscore', ontallyscore, false);
@@ -346,11 +347,15 @@ var ontallyscore = function(e){
 }
 
 var onmatch = function(e){
-    var these     = document.getElementsByClassName('flipped'),
-       len       = these.length,
-       onmatchend = function(t){
+    var these      = document.getElementsByClassName('flipped'),
+      	len        = these.length,
+       	onmatchend = function(t){
           t.target.classList.add('invisible');
           t.target.removeEventListener(transend,onmatchend,false);
+         
+          /* Restore event listener removed in onclick 
+             when a pair has been flipped. */
+          window.addEventListener(tap,onclick,false); 
        }
 
     Array.prototype.map.call(these, function(o){
@@ -358,11 +363,13 @@ var onmatch = function(e){
        o.addEventListener(transend,onmatchend,false);
     });
 
+	/* Check whether we should end the game */
+    conc.isdone();
+    
     /* Reset the list of flipped items */
     window.dispatchEvent( new CustomEvent('resetcards') );
 
-    /* Check whether we should end the game */
-    conc.isdone();
+    
 }
 
 var onreset = function(e){
@@ -373,9 +380,14 @@ var onreset = function(e){
           o.classList.remove('flipped');
        }
     });
-
+	
     /* reset the current pair. */
     curpair.length = 0;
+	
+    /* Restore event listener removed in onclick 
+      when a pair has been flipped. */
+	window.addEventListener(tap,onclick,false);
+
 }
 
 var onsavescore = function(e){

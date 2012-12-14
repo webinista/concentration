@@ -1,7 +1,7 @@
 /*
 MemoryConcentration version 1.0
 Copyright 2012 Tiffany B. Brown
-http://tiffanybbrown.com
+http: //tiffanybbrown.com
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -9,7 +9,7 @@ a copy of this software and associated documentation files (the
 without limitation the rights to use, copy, modify, merge, publish,
 distribute, sublicense, and/or sell copies of the Software, and to
 permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
+the following conditions: 
 
 The above copyright notice and this permission notice shall be
 included in all copies or substantial portions of the Software.
@@ -26,219 +26,213 @@ Note that images and fonts are subject to separate licenses.
 */
 
 html, body{
-    height:100%;
-    margin:0;
-    padding:0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 body{
-    background:#eee;
+    background: #eee;
     font: 95% / 1.2 'DroidSansRegular',helvetica,arial,sans-serif;
-    color:#222;
+    color: #222;
 }
 #deck{
-   -moz-perspective: 1000px;
-    -ms-perspective: 1000px;
-     -o-perspective: 1000px;
--webkit-perspective: 1000px;
-        perspective: 1000px;
--webkit-perspective-origin: 50% 50%;
-    min-height: 100%;
-    margin:1rem auto;
-    width:825px;
+	-webkit-perspective: 1000px;
+ 	   -moz-perspective: 1000px;
+        -ms-perspective: 1000px;
+         -o-perspective: 1000px;
+            perspective: 1000px;
+	-webkit-perspective-origin: 50% 50%;
+	   -moz-perspective-origin: 50% 50%;
+	    -ms-perspective-origin: 50% 50%;
+ 	     -o-perspective-origin: 50% 50%;
+           min-height: 100%;
+    margin: 1rem auto;
+    width: 825px;
 }
 
 .card{
-    width: 121px;
-    height: 121px;
-    float:left;
-    margin:0 85px 85px 0;
-    cursor:pointer;
-    position:relative;
+    width: auto;
+	height: auto;
+    float: left;
+    margin: 0 205px 205px 0;
+    cursor: pointer;
+    position: relative;
+	-webkit-transition: -webkit-transform 300ms ease-in-out 500ms;
+       -moz-transition:    -moz-transform 300ms ease-in-out 500ms;
+        -ms-transition:     -ms-transform 300ms ease-in-out 500ms;
+            transition:         transform 300ms ease-in-out 500ms;
 
-   -moz-transition:    -moz-transform 300ms ease-in-out 500ms;
-    -ms-transition:     -ms-transform 300ms ease-in-out 500ms;
-     -o-transition:      -o-transform 300ms ease-in-out 500ms;
--webkit-transition: -webkit-transform 300ms ease-in-out 500ms;
-        transition:         transform 300ms ease-in-out 500ms;
+	-webkit-transform-style: preserve-3d;
+       -moz-transform-style: preserve-3d;
+        -ms-transform-style: preserve-3d;
+            transform-style: preserve-3d;
+}
 
-   -moz-transform-style: preserve-3d;
-    -ms-transform-style: preserve-3d;
-     -o-transform-style: preserve-3d;
--webkit-transform-style: preserve-3d;
-        transform-style: preserve-3d;
+.card: nth-child(4n){
+     margin-right: 0;
 }
 
 .front, .back{
-    padding: 20px;
-    background:#fff;
-}
-
-#deck .card:nth-child(4n){
-     margin-right:0;
-}
-
-.front, .back{
+	padding: 20px;
+    background: #fff;
     position: absolute;
-    top:0;
+    top: 0;
     left: 0;
-    margin:0;
-    height:inherit;
+    margin: 0;
+    height: inherit;
     width: inherit;
-    -moz-backface-visibility: hidden;
-     -ms-backface-visibility: hidden;
-      -o-backface-visibility: hidden;
- -webkit-backface-visibility: hidden;
-         backface-visibility: hidden;
     border: 10px solid rgba(255,255,255,1);
-      box-shadow:0 0 10px #999;
-      border-radius:10px;
+    box-shadow: 0 0 10px #999;
+    border-radius: 10px;
+    -webkit-backface-visibility: hidden;
+       -moz-backface-visibility: hidden;
+        -ms-backface-visibility: hidden;
+         -o-backface-visibility: hidden;
+	        backface-visibility: hidden;
+	width: 121px;
+	height:121px;
+
 }
 
-.front, .front img{background: #fff; display:block;}
+.front, .front img{background: #fff; display: block;}
 .back{background: #BCC1D1 url(images/cardback2.gif);}
 
+.flipped{
+	-webkit-transform: rotate3d(100,100,0,180deg);
+  	   -moz-transform: rotate3d(100,100,0,180deg);
+        -ms-transform: rotate3d(100,100,0,180deg);
+            transform: rotate3d(100,100,0,180deg);
 
-.card.flipped{
-   -moz-transform: rotate3d(100,100,0,180deg);
-    -ms-transform: rotate3d(100,100,0,180deg);
-     -o-transform: rotate3d(100,100,0,180deg);
--webkit-transform: rotate3d(100,100,0,180deg);
-        transform: rotate3d(100,100,0,180deg);
-
-   -moz-transition:    -moz-transform 300ms ease-in-out;
-    -ms-transition:     -ms-transform 300ms ease-in-out;
-     -o-transition:      -o-transform 300ms ease-in-out;
--webkit-transition: -webkit-transform 300ms ease-in-out;
-        transition:         transform 300ms ease-in-out;
+	-webkit-transition: -webkit-transform 300ms ease-in-out;
+   	   -moz-transition:    -moz-transform 300ms ease-in-out;
+        -ms-transition:     -ms-transform 300ms ease-in-out;
+            transition:         transform 300ms ease-in-out;
 
 }
 
-.back img{margin:auto;}
 
-.card .front{
-   -moz-transform: rotate3d(-100,-100,0,-180deg);
-    -ms-transform: rotate3d(-100,-100,0,-180deg);
-     -o-transform: rotate3d(-100,-100,0,-180deg);
--webkit-transform: rotate3d(-100,-100,0,-180deg);
-        transform: rotate3d(-100,-100,0,-180deg);
+
+.front{
+	-webkit-transform: rotate3d(-100,-100,0,-180deg);
+       -moz-transform: rotate3d(-100,-100,0,-180deg);
+        -ms-transform: rotate3d(-100,-100,0,-180deg);
+            transform: rotate3d(-100,-100,0,-180deg);
 }
 
-.card.matched{
+.matched{
     background: #fff;
-   -moz-transform: scale(.01);
-    -ms-transform: scale(.01);
-     -o-transform: scale(.01);
--webkit-transform: scale(.01);
-        transform: scale(.01);
+	-webkit-transform: scale(.01);
+	   -moz-transform: scale(.01);
+		-ms-transform: scale(.01);
+		 -o-transform: scale(.01);
+			transform: scale(.01);
 }
 
-.invisible{visibility:hidden;}
+.invisible{visibility: hidden;}
 
 #overlay{
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,.5);
-    position:fixed;
-    top:0;
-    left:0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin:0;
 }
 
 .panel{
     background: rgb(255,255,255);
-    margin:2rem 3rem;
+    margin: 2rem 3rem;
     padding: 3rem;
     text-align: center;
-    position:relative;
+    position: relative;
     box-shadow: 0px 0px 20px #333;
     border-radius: .3rem
 }
 
-.innerwrap{margin:0 auto;}
+.innerwrap{margin: 0 auto;}
 
 .hide{display: none;}
 
-label{display:block;}
+label{display: block;}
 
 select{
-    text-align:right;
-    font-size:2rem;
-    padding-right:.3rem;
-    vertical-align:middle
+    text-align: right;
+    font-size: 2rem;
+    padding-right: .3rem;
+    vertical-align: middle
 }
 
-.close, button.btn{
-    font-family: 'SansitaOneRegular';
+.close, .btn{
+    font-family: 'SansitaOneRegular','sans-serif';
 }
 
 .close{
-    position:absolute;
-    right:0.8rem;
-    top:0.8rem;
-    color:#fff;
-    padding:.25rem .55rem;
-    border:3px solid #aa0000;
-    border-radius:15px;
+    position: absolute;
+    right: 0.8rem;
+    top: 0.8rem;
+    color: #fff;
+    padding: .25rem .55rem;
+    border: 3px solid #aa0000;
+    border-radius: 15px;
     box-shadow: 2px 2px 0.5rem #666, inset 0px 1px .21rem #333;
-    cursor:pointer;
+    cursor: pointer;
     background-color: #e11d11;
-    background-image: -webkit-linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
-    background-image: -moz-linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
-    background-image: -o-linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
-    background-image: -ms-linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
-    background-image: linear-gradient(top, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
+    background-image: -webkit-linear-gradient(90deg, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
+    background-image:    -moz-linear-gradient(180deg, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
+    background-image:     -ms-linear-gradient(180deg, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
+    background-image:      -o-linear-gradient(180deg, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
+    background-image:         linear-gradient(180deg, hsl(3, 86%, 47%), hsl(4, 89%, 29%));
 }
 
-.close:hover{
+.close: hover{
     background-color: #8b1008;
-    background-image: -webkit-linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
-    background-image: -moz-linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
-    background-image: -o-linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
-    background-image: -ms-linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
-    background-image: linear-gradient(top, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
+    background-image: -webkit-linear-gradient(90deg, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
+    background-image:    -moz-linear-gradient(180deg, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
+    background-image:     -ms-linear-gradient(180deg, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
+    background-image:      -o-linear-gradient(180deg, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
+    background-image:         linear-gradient(180deg, hsl(4, 89%, 29%), hsl(3, 86%, 47%));
 }
 
-.close:active, button.btn:active{box-shadow:none;}
+.close: active, .btn: active{box-shadow: none;}
 
-button.btn{
-    border:3px solid #537f94;
+.btn{
+    border: 3px solid #537f94;
     font-size: 2em;
-    line-height:1;
-    color:#fff;
+    line-height: 1;
+    color: #fff;
     box-shadow: 2px 2px 0.5rem #666, inset 1px 1px .31rem #666;
-    border-radius:30px;
-    cursor:pointer;
-    padding:.5rem 2rem;
-    background-color: #336699;
+    border-radius: 30px;
+    cursor: pointer;
+    padding: .5rem 2rem;
     background-color: #537f94;
-    background-image: -webkit-linear-gradient(top, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
-    background-image: -moz-linear-gradient(top, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
-    background-image: -o-linear-gradient(top, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
-    background-image: -ms-linear-gradient(top, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
-    background-image: linear-gradient(top, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
+    background-image: -webkit-linear-gradient(270deg, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
+    background-image:    -moz-linear-gradient(180deg, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
+    background-image:     -ms-linear-gradient(180deg, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
+   	background-image:      -o-linear-gradient(180deg, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
+    background-image:         linear-gradient(180deg, hsl(199, 28%, 45%), hsl(210, 55%, 26%));
 }
 
-button.btn:hover{
+.btn: hover{
     background-color: #1e4266;
-    background-image: -webkit-linear-gradient(top, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
-    background-image: -moz-linear-gradient(top, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
-    background-image: -o-linear-gradient(top, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
-    background-image: -ms-linear-gradient(top, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
-    background-image: linear-gradient(top, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
+    background-image: -webkit-linear-gradient(270deg, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
+    background-image:    -moz-linear-gradient(180deg, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
+    background-image:     -ms-linear-gradient(180deg, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
+    background-image:      -o-linear-gradient(180deg, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
+    background-image:         linear-gradient(180deg, hsl(210, 55%, 26%), hsl(199, 28%, 45%));
 }
 
 ol{
     margin: 1rem auto;
     text-align: right;
-    width:13rem;
+    width: 13rem;
 }
 
-.display{font-family: 'SansitaOneRegular'; font-weight:500}
+.display{font-family: 'SansitaOneRegular','sans-serif'; font-weight: 500}
 
-h1{font-size:4rem;margin:0;}
-#config p{line-height:2}
-
-#score p{font-weight:bold;font-family:'DroidSansRegular';margin:1.5rem,}
-#score p b{font-size:2.2em;display:block;font-family:'DroidSansBold';font-weight:normal}
-#score h1{font-size:1.5em;}
-#score h1 b{font-size:2.2em;}
+h1{font-family: inherit;font-size: 4rem;margin: 0;}
+#config p{line-height: 2}
+#score p{font-weight: bold;font-family: 'DroidSansRegular','sans-serif';margin: 1.5rem,}
+#score b{font-size: 2.2em;display: block;font-family: 'DroidSansBold','sans-serif';font-weight: normal}
+#score h1{font-size: 1.5em;}
 #countdown{font-size: 8rem;min-height: 10rem;}

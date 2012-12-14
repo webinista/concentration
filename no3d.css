@@ -10,7 +10,7 @@
 
 }
 
-.card.flipped .back{
+.flipped .back{
     opacity: 0;
    -moz-transition: opacity 300ms ease-in-out;
     -ms-transition: opacity 300ms ease-in-out;
@@ -20,18 +20,7 @@
 
 }
 
-.card.matched .back{opacity:0;}
-
-.card.matched{
-    background: #fff;
-   -moz-transform: scale(.01);
-    -ms-transform: scale(.01);
-     -o-transform: scale(.01);
--webkit-transform: scale(.01);
-        transform: scale(.01);
-}
-
-.card.matched{
+.matched{
    -moz-transition: -moz-transform 300ms ease-in-out;
     -ms-transition: -ms-transform 300ms ease-in-out;
      -o-transition: -o-transform 300ms ease-in-out;
