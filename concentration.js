@@ -249,7 +249,7 @@ Concentration.prototype.seconds = function(start,end){
 Concentration.prototype.tally = function(time,pairs,tries){
     var results = {};
     results.score = (pairs / time / tries) * 1000000;
-    results.successrate = (pairs / tries) * 100;
+    results.successrate = (pairs / tries) * 100; 
     return results;
 }
 
